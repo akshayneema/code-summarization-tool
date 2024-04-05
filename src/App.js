@@ -33,7 +33,7 @@ function App() {
       });
 
       // Extract and set the generated summary
-      setSummary(response.data.summary);
+      setSummary(response.data[0]['summary_text']);
       // Reset ratings to default values when generating a new summary
       setNaturalnessRating(3); // Average
       setUsefulnessRating(3); // Average
@@ -77,7 +77,7 @@ function App() {
       <div>
         <h2 className="summary-title">Generated Summary:</h2>
         {isSummaryGenerating ? (
-          <p className="loading-message">Generating summary...</p>
+          <p className="loading-message">Hold on a sec till I get your summary...</p>
         ) : (
           <p className="summary">{summary}</p>
         )}
