@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import './App.css'; // Import CSS file for styling
+import axios from 'axios'; 
+
+// const openai = new OpenAI({ apiKey: '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', dangerouslyAllowBrowser: true, model: "text-davinci-003"});
 
 function App() {
   // State to store code snippet input
@@ -12,6 +15,8 @@ function App() {
   const [consistencyRating, setConsistencyRating] = useState(3); // Default: Average
   // State to track whether a summary is generated
   const [isSummaryGenerated, setIsSummaryGenerated] = useState(false);
+  const [isSummaryGenerating, setIsSummaryGenerating] = useState(false);
+
 
   // Function to handle code snippet input change
   const handleCodeChange = (event) => {
@@ -19,16 +24,26 @@ function App() {
   };
 
   // Function to handle "Generate Summary" button click
-  const generateSummary = () => {
-    // Placeholder logic: Send codeSnippet to backend for summarization
-    // For now, just display the codeSnippet itself as summary
-    setSummary(codeSnippet);
-    // Reset ratings to default values when generating a new summary
-    setNaturalnessRating(3); // Average
-    setUsefulnessRating(3); // Average
-    setConsistencyRating(3); // Average
-    // Set isSummaryGenerated to true
-    setIsSummaryGenerated(true);
+  const generateSummary = async () => {
+    setIsSummaryGenerating(true); // Set loading state to true
+    try {
+      // Call the backend API to generate summary
+      const response = await axios.post('http://localhost:5000/generate-summary', {
+        codeSnippet: codeSnippet
+      });
+
+      // Extract and set the generated summary
+      setSummary(response.data.summary);
+      // Reset ratings to default values when generating a new summary
+      setNaturalnessRating(3); // Average
+      setUsefulnessRating(3); // Average
+      setConsistencyRating(3); // Average
+      // Set isSummaryGenerated to true
+      setIsSummaryGenerated(true);
+    } catch (error) {
+      console.error('Error generating summary:', error);
+    }
+    setIsSummaryGenerating(false); 
   };
 
   // Function to handle "Submit Rating" button click
@@ -52,18 +67,23 @@ function App() {
         placeholder="Enter your code snippet here..."
         value={codeSnippet}
         onChange={handleCodeChange}
+        disabled={isSummaryGenerating} 
       ></textarea>
       <br />
       {/* "Generate Summary" button */}
-      <button className="generate-btn" onClick={generateSummary}>Generate Summary</button>
+      <button className="generate-btn" onClick={generateSummary} disabled={isSummaryGenerating}>Generate Summary</button>
       <hr />
       {/* Display area for generated summary */}
       <div>
         <h2 className="summary-title">Generated Summary:</h2>
-        <p className="summary">{summary}</p>
+        {isSummaryGenerating ? (
+          <p className="loading-message">Generating summary...</p>
+        ) : (
+          <p className="summary">{summary}</p>
+        )}
       </div>
       {/* Rating section */}
-      {isSummaryGenerated && (
+      {(summary && !isSummaryGenerating) && (
         <div className="rating-container">
           <h2 className="rating-title">Rate the Summary:</h2>
           <div className="rating-perspective">
