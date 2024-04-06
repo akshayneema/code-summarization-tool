@@ -2,54 +2,117 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: #f8f8f8; /* Light background */
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .title {
   text-align: center;
+  font-size: 2em;
+  color: #61dafb; /* Light blue */
+  margin-bottom: 20px;
+}
+
+.rating-label {
+  color: #333; /* Adjust the color as needed */
+}
+
+
+/* Light Theme */
+.light-theme {
+  background-color: #f8f8f8;
+  color: #333; /* Text color for light theme */
+}
+
+/* Dark Theme */
+.dark-theme {
+  background-color: #333;
+  color: #f8f8f8; /* Text color for dark theme */
+}
+
+/* Light Theme */
+.light-theme .summary {
+  color: #333; /* Text color for light theme */
+}
+
+/* Dark Theme */
+.dark-theme .summary {
+  color: #f8f8f8; /* Text color for dark theme */
+}
+
+.dark-mode-label {
+  color: #fff;
+}
+
+.dark-mode-btn {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Additional styling for theme toggle button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  font-size: 24px;
 }
 
 .code-input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 2px solid #61dafb; /* Light blue border */
+  border-radius: 10px;
+  font-family: 'Courier New', monospace; /* Monospace font for coding */
+  font-size: 1.2em;
+  background-color: #fff; /* White background for code input */
+  color: #333; /* Dark text */
 }
 
 .generate-btn {
-  padding: 10px 20px;
-  background-color: #007bff;
+  padding: 15px 40px;
+  background-color: #61dafb; /* Light blue */
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
+  font-size: 1.2em;
+  transition: background-color 0.3s ease;
 }
 
 .generate-btn:hover {
-  background-color: #0056b3;
+  background-color: #4b8be0; /* Darker blue on hover */
 }
 
 .summary-title {
   margin-top: 20px;
+  font-size: 1.5em;
+  color: #61dafb; /* Light blue */
 }
 
 .summary {
   white-space: pre-wrap;
+  font-size: 1.2em;
+  line-height: 1.5;
+  color: #333; /* Dark text */
 }
 
 .rating-container {
   margin-top: 20px;
   padding: 20px;
-  background-color: #f8f8f8;
+  background-color: #fff; /* White background for rating container */
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .rating-title {
   margin-bottom: 10px;
+  font-size: 1.5em;
+  color: #61dafb; /* Light blue */
 }
 
 .rating-perspective {
@@ -58,8 +121,8 @@
 
 .rating-options {
   display: flex;
-  gap: 10px;
-  margin-top: 5px;
+  gap: 20px;
+  margin-top: 10px;
 }
 
 .rating-options input[type="radio"] {
@@ -68,32 +131,35 @@
 
 .rating-options label {
   cursor: pointer;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  padding: 5px 10px;
-  border-radius: 5px;
+  background-color: #fff; /* White background */
+  border: 2px solid #61dafb; /* Light blue border */
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 1.2em;
+  color: #61dafb; /* Light blue text */
+  transition: background-color 0.3s ease;
 }
 
 .rating-options label:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0; /* Lighter background on hover */
 }
 
 .rating-options input[type="radio"]:checked + label {
-  background-color: #007bff;
+  background-color: #61dafb; /* Light blue */
   color: #fff;
-  border-color: #007bff;
 }
 
 .submit-rating-btn {
-  padding: 10px 20px;
-  background-color: #007bff;
+  padding: 15px 40px;
+  background-color: #61dafb; /* Light blue */
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
+  font-size: 1.2em;
   transition: background-color 0.3s ease;
 }
 
 .submit-rating-btn:hover {
-  background-color: #0056b3;
+  background-color: #4b8be0; /* Darker blue on hover */
 }
