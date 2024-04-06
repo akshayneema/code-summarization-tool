@@ -20,24 +20,30 @@ The Code Summarization Tool is a web application that allows users to input code
    git clone <repository-url>
    cd code-summarization-tool
 
-2. **Create and activate a conda environment:**
+2. **Install frontend dependencies**
+   ```bash
+   npm install
+
+3. **Create and activate a conda environment:**
    ```bash
    conda create --name 520 python=3.9
    conda activate 520
 
-3. **Install dependencies using requirements.txt:**
+4. **Install server dependencies:**
    ```bash
    pip install -r requirements.txt
 
-4. **Start React App:**
+## Activate App and Server (Use separate command lines)
+
+1. **Activate Python Server:**
    ```bash
-   npm install
+   python server/server.py
+
+2. **Start React App:**
+   ```bash
    npm start
 
-5. **Activate Python Server:**
-   ```bash
-   cd server
-   python server.py
+
 
 ## Open the web app in your browser:
 - React app: [http://localhost:3000](http://localhost:3000)
