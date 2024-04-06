@@ -26,8 +26,8 @@ The Code Summarization Tool is a web application that allows users to input code
 
 3. **Create and activate a conda environment:**
    ```bash
-   conda create --name 520 python=3.9
-   conda activate 520
+   conda create --name cs520 python=3.9
+   conda activate cs520
 
 4. **Install server dependencies:**
    ```bash
@@ -37,6 +37,7 @@ The Code Summarization Tool is a web application that allows users to input code
 
 1. **Activate Python Server:**
    ```bash
+   conda activate cs520
    python server/server.py
 
 2. **Start React App:**
