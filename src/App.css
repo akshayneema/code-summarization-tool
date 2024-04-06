@@ -107,6 +107,18 @@
   background-color: #fff; /* White background for rating container */
   border: 1px solid #ddd;
   border-radius: 10px;
+  transition: opacity 0.5s ease, visibility 0.5s ease; /* Smooth transition for opacity and visibility */
+  opacity: 1; /* Initially visible */
+  visibility: visible; /* Initially visible */
+}
+
+.rating-container.hidden {
+  opacity: 0; /* Fade out when hidden */
+  visibility: hidden; /* Hide element when hidden */
+  height: 0; /* Collapse height when hidden */
+  padding: 0;
+  margin: 0;
+  transition: opacity 0.5s ease, visibility 0.5s ease, height 0.5s ease; /* Smooth transition for opacity, visibility, and height when becoming hidden */
 }
 
 .rating-title {
@@ -163,3 +175,44 @@
 .submit-rating-btn:hover {
   background-color: #4b8be0; /* Darker blue on hover */
 }
+
+/* Add blip animation */
+@keyframes blip {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.summary-container.blip {
+  animation: blip 1s ease infinite;
+}
+
+
+/* Add transition for generate button */
+.generate-btn {
+  transition: background-color 0.3s ease;
+}
+
+.generate-btn.disabled {
+  background-color: #ccc;
+}
+
+/* Add transition for theme toggle button */
+.theme-toggle {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle.theme-toggle-light {
+  transform: rotate(0deg);
+}
+
+.theme-toggle.theme-toggle-dark {
+  transform: rotate(180deg);
+}
+
