@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css'; // Import CSS file for styling
 import axios from 'axios'; 
 import { Editor } from '@monaco-editor/react'; 
+import { Button, Select, MenuItem } from '@material-ui/core';
 
 // const openai = new OpenAI({ apiKey: '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', dangerouslyAllowBrowser: true, model: "text-davinci-003"});
 
@@ -75,13 +76,18 @@ function App() {
       </div>
       {/* Input area for code snippet */}
       <div className="language-dropdown">
-        <label>Select Language:</label>
-        <select value={selectedLanguage} onChange={handleLanguageChange}>
-          <option value="python">Python</option>
-          <option value="javascript">JavaScript</option>
-          <option value="java">Java</option>
-          {/* Add more options as needed */}
-        </select>
+        <label>Select Language: </label>
+        <Select
+          value={selectedLanguage}
+          onChange={handleLanguageChange}
+          renderValue={(value) => (
+            <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedLanguage}</span>
+          )}
+        >
+          <MenuItem value="Python">Python</MenuItem>
+          <MenuItem value="JavaScript">JavaScript</MenuItem>
+          <MenuItem value="Java">Java</MenuItem>
+        </Select>
       </div>
       <Editor
         language="python"
