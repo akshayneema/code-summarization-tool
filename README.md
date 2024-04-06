@@ -43,8 +43,6 @@ The Code Summarization Tool is a web application that allows users to input code
    ```bash
    npm start
 
-
-
 ## Open the web app in your browser:
 - React app: [http://localhost:3000](http://localhost:3000)
 - Python server: [http://localhost:5000](http://localhost:5000)
