@@ -1,11 +1,44 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 # from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer, AutoModelWithLMHead, SummarizationPipeline
+from werkzeug.security import generate_password_hash, check_password_hash
 import torch
+from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
 
 app = Flask(__name__)
 CORS(app)
+app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+db = SQLAlchemy(app)
+
+# Define User model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password_hash = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+# Use app.app_context() to ensure the code is executed within the application context
+with app.app_context():
+    # Create database tables
+    db.create_all()
+
+# Admin decorator to restrict access to administrators only
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') != 'admin':
+            return jsonify({'message': 'Unauthorized access'}), 403
+        return f(*args, **kwargs)
+    return decorated_function
 
 # # Load the pre-trained model and tokenizer
 # model_name = "t5-base"  # You can replace this with any other model from Hugging Face's model hub
@@ -16,6 +49,56 @@ pipeline = SummarizationPipeline(
     model=AutoModelWithLMHead.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune"),
     tokenizer=AutoTokenizer.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune", skip_special_tokens=True)
 )
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    role = data.get('role')
+
+    if not username or not password or not role:
+        return jsonify({'message': 'Missing username, password, or role'}), 400
+
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return jsonify({'message': 'Username already exists'}), 409
+
+    user = User(username=username, role=role)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({'message': 'User registered successfully'}), 201
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'message': 'Missing username or password'}), 400
+
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({'message': 'Invalid username or password'}), 401
+
+    session['username'] = username
+    session['role'] = user.role
+    return jsonify({'message': 'Login successful', 'role': user.role}), 200
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return jsonify({'message': 'Logged out successfully'}), 200
+
+@app.route('/check-login')
+def check_login():
+    if 'username' in session:
+        return 'True', 200
+    else:
+        return 'False', 401
+
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():
