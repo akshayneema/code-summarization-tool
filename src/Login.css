@@ -46,3 +46,18 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+.no-account {
+    margin-top: 10px;
+    font-size: 14px; /* Adjust font size */
+    color: #333; /* Text color */
+}
+
+.register-link {
+    color: #007bff; /* Link color */
+    cursor: pointer;
+}
+
+.register-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, make_response
 from flask_cors import CORS
 # from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer, AutoModelWithLMHead, SummarizationPipeline
@@ -6,11 +6,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import torch
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Configure Flask-JWT-Extended
+app.config['JWT_SECRET_KEY'] = 'jwt_secret_key'
+jwt = JWTManager(app)
 db = SQLAlchemy(app)
 
 # Define User model
@@ -25,6 +29,17 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+def create_admin_user():
+    # Check if the admin user already exists
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        # Create the admin user with default username and password
+        admin = User(username='username', role='admin')
+        admin.set_password('admin')  # Set default password
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin user created successfully")
 
 # Use app.app_context() to ensure the code is executed within the application context
 with app.app_context():
@@ -64,11 +79,15 @@ def register():
     if existing_user:
         return jsonify({'message': 'Username already exists'}), 409
 
+    # Generate JWT token
+    access_token = create_access_token(identity=username)
     user = User(username=username, role=role)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
-    return jsonify({'message': 'User registered successfully'}), 201
+    resp = make_response(jsonify({'message': 'User registered successfully'}), 201)
+    resp.set_cookie('access_token', access_token, httponly=True)
+    return resp
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -83,9 +102,13 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'message': 'Invalid username or password'}), 401
 
+    # Generate JWT token
+    access_token = create_access_token(identity=username)
     session['username'] = username
     session['role'] = user.role
-    return jsonify({'message': 'Login successful', 'role': user.role}), 200
+    resp = make_response(jsonify({'message': 'Login successful'}), 200)
+    resp.set_cookie('access_token', access_token, httponly=True)
+    return resp
 
 @app.route('/logout')
 def logout():
@@ -93,12 +116,10 @@ def logout():
     return jsonify({'message': 'Logged out successfully'}), 200
 
 @app.route('/check-login')
+@jwt_required()
 def check_login():
-    if 'username' in session:
-        return 'True', 200
-    else:
-        return 'False', 401
-
+    current_user = get_jwt_identity()
+    return jsonify({'message': 'Logged in as: ' + current_user}), 200
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():

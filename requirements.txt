@@ -5,3 +5,4 @@ sentencepiece==0.2.0
 torch==2.2.0
 transformers==4.30.2
 flask_sqlalchemy==3.1.1
+Flask-JWT-Extended==4.6.0
