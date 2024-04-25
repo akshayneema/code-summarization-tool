@@ -85,8 +85,7 @@ def register():
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
-    resp = make_response(jsonify({'message': 'User registered successfully'}), 201)
-    resp.set_cookie('access_token', access_token, httponly=True)
+    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token}), 201)
     return resp
 
 @app.route('/login', methods=['POST'])
@@ -106,8 +105,7 @@ def login():
     access_token = create_access_token(identity=username)
     session['username'] = username
     session['role'] = user.role
-    resp = make_response(jsonify({'message': 'Login successful'}), 200)
-    resp.set_cookie('access_token', access_token, httponly=True)
+    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token}), 200)
     return resp
 
 @app.route('/logout')
@@ -119,7 +117,7 @@ def logout():
 @jwt_required()
 def check_login():
     current_user = get_jwt_identity()
-    return jsonify({'message': 'Logged in as: ' + current_user}), 200
+    return jsonify({'message': 'Logged in as: ' + current_user, 'status': 'True'}), 200
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():

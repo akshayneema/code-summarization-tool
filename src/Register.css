@@ -6,26 +6,37 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: palegreen;
+  background-image: url('image.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
 .form-container {
-  background-color: white;
-  padding: 30px;
+  padding: 50px; /* Increased padding */
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 80%; /* Set the width to 80% of the container */
+  max-width: 300px; /* Set a maximum width */
+  margin: 0 auto; /* Center the form container horizontally */
 }
 
 .input-container {
   margin-bottom: 20px;
 }
 
+.register-heading {
+  color: white;
+  text-align: center;
+}
+
 input {
+  background: transparent;
   display: block;
   width: calc(100% - 20px); /* Adjusted width */
   margin-bottom: 10px;
   padding: 8px;
   font-size: 16px;
+  color: white;
 }
 
 button {
@@ -47,14 +58,15 @@ button:hover {
 .account-exists {
   margin-top: 10px;
   font-size: 14px; /* Adjust font size */
-  color: #333; /* Text color */
+  color: white; /* Text color */
 }
 
 .login-link {
-  color: #007bff; /* Link color */
+  color: white; /* Link color */
   cursor: pointer;
+  text-decoration: underline;
 }
 
 .login-link:hover {
-  text-decoration: underline; /* Underline on hover */
+  text-decoration: none; /* Underline on hover */
 }
