@@ -8,7 +8,7 @@ from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from all origins for all routes
 app.config['SECRET_KEY'] = 'your_secret_key'
 # Change the database URI to use a file-based SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -67,6 +67,10 @@ pipeline = SummarizationPipeline(
     model=AutoModelWithLMHead.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune"),
     tokenizer=AutoTokenizer.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune", skip_special_tokens=True)
 )
+
+@app.route('/', methods=['GET'])
+def health_check():
+    return 'OK'
 
 @app.route('/register', methods=['POST'])
 def register():

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Editor } from '@monaco-editor/react'; 
 import { Select, MenuItem } from '@material-ui/core';
+import './GenerateSummary.css'; // Import CSS file for component styling
 
 const GenerateSummary = () => {
   // State to store code snippet input

@@ -25,8 +25,16 @@
 }
 
 .input-container {
-    margin-bottom: 20px;
-}
+    position: relative;
+  }
+  
+  .icon {
+    color: white;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
 input {
     background: transparent;
