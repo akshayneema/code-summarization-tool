@@ -3,7 +3,6 @@ from flask_cors import CORS
 # from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer, AutoModelWithLMHead, SummarizationPipeline
 from werkzeug.security import generate_password_hash, check_password_hash
-import torch
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -11,7 +10,9 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Change the database URI to use a file-based SQLite database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking to suppress warnings
 # Configure Flask-JWT-Extended
 app.config['JWT_SECRET_KEY'] = 'jwt_secret_key'
 jwt = JWTManager(app)
@@ -45,6 +46,8 @@ def create_admin_user():
 with app.app_context():
     # Create database tables
     db.create_all()
+    # Create the admin user
+    create_admin_user()
 
 # Admin decorator to restrict access to administrators only
 def admin_required(f):
