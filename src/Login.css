@@ -4,26 +4,46 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: palegreen;
+    background-image: url('image.jpg');
+    background-size: cover;
+    background-position: center;
 }
 
 .form-container {
-    background-color: white;
     padding: 50px; /* Increased padding */
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Set the width to 80% of the container */
+    max-width: 300px; /* Set a maximum width */
+    margin: 0 auto; /* Center the form container horizontally */
+}
+
+
+.login-heading {
+    color: white;
+    text-align: center;
 }
 
 .input-container {
-    margin-bottom: 20px;
-}
+    position: relative;
+  }
+  
+  .icon {
+    color: white;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
 
 input {
+    background: transparent;
     display: block;
-    width: calc(100% - 20px); /* Adjusted width */
+    width: 80%; /* Set input width to 100% */
     margin-bottom: 15px; /* Increased margin */
     padding: 15px; /* Increased padding */
     font-size: 18px; /* Increased font size */
+    color: white;
 }
 
 .error-message {
@@ -50,14 +70,15 @@ button:hover {
 .no-account {
     margin-top: 10px;
     font-size: 14px; /* Adjust font size */
-    color: #333; /* Text color */
+    color: white; /* Text color */
 }
 
 .register-link {
-    color: #007bff; /* Link color */
+    color:white; /* Link color */
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .register-link:hover {
-    text-decoration: underline; /* Underline on hover */
+    text-decoration: none; /* Underline on hover */
 }

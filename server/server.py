@@ -3,16 +3,17 @@ from flask_cors import CORS
 # from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer, AutoModelWithLMHead, SummarizationPipeline
 from werkzeug.security import generate_password_hash, check_password_hash
-import torch
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import requests
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from all origins for all routes
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+# Change the database URI to use a file-based SQLite database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking to suppress warnings
 # Configure Flask-JWT-Extended
 app.config['JWT_SECRET_KEY'] = 'jwt_secret_key'
 jwt = JWTManager(app)
@@ -46,6 +47,8 @@ def create_admin_user():
 with app.app_context():
     # Create database tables
     db.create_all()
+    # Create the admin user
+    create_admin_user()
 
 # Admin decorator to restrict access to administrators only
 def admin_required(f):
@@ -65,6 +68,10 @@ def admin_required(f):
 #     model=AutoModelWithLMHead.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune"),
 #     tokenizer=AutoTokenizer.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune", skip_special_tokens=True)
 # )
+
+@app.route('/', methods=['GET'])
+def health_check():
+    return 'OK'
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -86,8 +93,7 @@ def register():
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
-    resp = make_response(jsonify({'message': 'User registered successfully'}), 201)
-    resp.set_cookie('access_token', access_token, httponly=True)
+    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token}), 201)
     return resp
 
 @app.route('/login', methods=['POST'])
@@ -107,8 +113,7 @@ def login():
     access_token = create_access_token(identity=username)
     session['username'] = username
     session['role'] = user.role
-    resp = make_response(jsonify({'message': 'Login successful'}), 200)
-    resp.set_cookie('access_token', access_token, httponly=True)
+    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token}), 200)
     return resp
 
 @app.route('/logout')
@@ -120,7 +125,7 @@ def logout():
 @jwt_required()
 def check_login():
     current_user = get_jwt_identity()
-    return jsonify({'message': 'Logged in as: ' + current_user}), 200
+    return jsonify({'message': 'Logged in as: ' + current_user, 'status': 'True'}), 200
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():

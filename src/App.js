@@ -9,22 +9,22 @@ import { useCookies } from 'react-cookie';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
-  const [cookies] = useCookies(['access_token']); // Retrieve the 'access_token' cookie
+  const [cookies] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
 
   useEffect(() => {
-    if (cookies.access_token) {
+    if (cookies.jwtToken) {
       checkLoginStatus();
     }
-  }, [cookies.access_token]);
+  }, [cookies.jwtToken]);
 
   const checkLoginStatus = async () => {
     try {
       const response = await axios.get('http://127.0.0.1:5000/check-login', {
         headers: {
-          Authorization: `Bearer ${cookies.access_token}`, // Send token as a header
+          Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
         },
       });
-      if (response.data === 'True') {
+      if (response.data && response.data.status === 'True') {
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
@@ -50,7 +50,11 @@ function App() {
     <div>
       {!isLoggedIn && showLogin && <Login onSuccess={handleLoginSuccess} onRegisterClick={handleRegister}/>}
       {!isLoggedIn && !showLogin && <Register onSuccess={handleLoginSuccess} onLoginClick={handleLogin}/>}
-      {isLoggedIn && <GenerateSummary />}
+      {isLoggedIn && (
+        <div className="generate-summary">
+          <GenerateSummary />
+        </div>
+      )}
     </div>
   );
 }
