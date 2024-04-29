@@ -39,24 +39,37 @@ const GenerateSummary = () => {
   // Function to handle "Generate Summary" button click
   const generateSummary = async () => {
     setIsSummaryGenerating(true); // Set loading state to true
-    try {
-      // Call the backend API to generate summary
-      const response = await axios.post('http://127.0.0.1:5000/generate-summary', {
-        codeSnippet: codeSnippet
-      });
-
-      // Extract and set the generated summary
-      setSummary(response.data[0]['summary_text']);
-      // Reset ratings to default values when generating a new summary
-      setNaturalnessRating(3); // Average
-      setUsefulnessRating(3); // Average
-      setConsistencyRating(3); // Average
-      setIsRatingSectionOpen(true);
-    } catch (error) {
-      console.error('Error generating summary:', error);
-    }
-    setIsSummaryGenerating(false); 
-  };
+      try {
+        const payload = {
+          "model": "codellama:7b",
+          "prompt": "Describe the code very briefly in one sentence - " + codeSnippet,
+          "stream": false
+        };
+    
+        const response = await fetch('http://localhost:11434/api/generate', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+    
+        if (!response.  ok) {
+          throw new Error('Failed to generate summary');
+        }
+    
+        const responseData = await response.json();
+        setSummary(responseData.response);
+        setNaturalnessRating(3); // Average
+        setUsefulnessRating(3); // Average
+        setConsistencyRating(3); // Average
+        setIsRatingSectionOpen(true);
+      } catch (error) {
+        console.error('Error generating summary:', error);
+      } finally {
+        setIsSummaryGenerating(false);
+      }
+    };  
 
   // Function to handle "Submit Rating" button click
   const submitRating = () => {

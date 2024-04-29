@@ -7,6 +7,7 @@ import torch
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -60,10 +61,10 @@ def admin_required(f):
 # tokenizer = AutoTokenizer.from_pretrained(model_name)
 # model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-pipeline = SummarizationPipeline(
-    model=AutoModelWithLMHead.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune"),
-    tokenizer=AutoTokenizer.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune", skip_special_tokens=True)
-)
+# pipeline = SummarizationPipeline(
+#     model=AutoModelWithLMHead.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune"),
+#     tokenizer=AutoTokenizer.from_pretrained("SEBIS/code_trans_t5_large_source_code_summarization_python_multitask_finetune", skip_special_tokens=True)
+# )
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -125,19 +126,31 @@ def check_login():
 def generate_summary():
     if request.method == 'POST':
         data = request.json  # Get the JSON data from the request
-        code_snippet = data['codeSnippet']
-        print("Received data:", code_snippet)  # Print the received data to the console
+        code_snippet = data.get('codeSnippet')  # Retrieve the code snippet from the JSON data
         
-        # Tokenize the input code snippet
-        # inputs = tokenizer.encode("summarize: " + code_snippet, return_tensors="pt", max_length=1024, truncation=True)
+        # Define the API endpoint URL
+        url = 'http://localhost:11434/api/generate'
 
-        inputs = pythonTokenizer(code_snippet)
+        # Define the request payload (JSON data)
+        payload = {
+            "model": "codellama:7b",
+            "prompt": "Please geneate natural language summary for the code - " + code_snippet,
+            "format": "json",
+            "stream": False
+        }
 
-        # # Generate the summary using the pre-trained model
-        # summary_ids = model.generate(inputs, max_length=150, min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
-        # summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        # Make the POST request
+        response = requests.post(url, json=payload)
 
-        return pipeline([inputs])
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Extract the JSON response
+            json_data = response.json()
+            # Process the JSON data as needed
+            return json_data['response']
+        else:
+            # Print the error message if the request failed
+            return f"Error: {response.status_code} - {response.text}", 500
     
     elif request.method == 'OPTIONS':
         # Respond to OPTIONS requests with CORS headers
