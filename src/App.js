@@ -10,6 +10,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [cookies] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
+  const [userId, setUserId] = useState(null); // State to store user ID
 
   useEffect(() => {
     if (cookies.jwtToken) {
@@ -26,6 +27,7 @@ function App() {
       });
       if (response.data && response.data.status === 'True') {
         setIsLoggedIn(true);
+        setUserId(response.data.user_id); // Set user ID from response
       } else {
         setIsLoggedIn(false);
       }
@@ -34,8 +36,9 @@ function App() {
     }
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (userId) => {
     setIsLoggedIn(true);
+    setUserId(userId); // Set user ID upon successful login
   };
 
   const handleLogin = () => {
@@ -52,7 +55,7 @@ function App() {
       {!isLoggedIn && !showLogin && <Register onSuccess={handleLoginSuccess} onLoginClick={handleLogin}/>}
       {isLoggedIn && (
         <div className="generate-summary">
-          <GenerateSummary />
+          <GenerateSummary userId={userId} /> 
         </div>
       )}
     </div>

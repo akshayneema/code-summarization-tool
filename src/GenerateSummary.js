@@ -3,8 +3,9 @@ import axios from 'axios';
 import { Editor } from '@monaco-editor/react'; 
 import { Select, MenuItem } from '@material-ui/core';
 import './GenerateSummary.css'; // Import CSS file for component styling
+import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
 
-const GenerateSummary = () => {
+const GenerateSummary = ({userId}) => {
   // State to store code snippet input
   const [codeSnippet, setCodeSnippet] = useState('');
   // State to store generated summary
@@ -19,7 +20,10 @@ const GenerateSummary = () => {
   const [isSummaryGenerating, setIsSummaryGenerating] = useState(false);
   const [isBlip, setIsBlip] = useState(false); // State to trigger blip animation
 
-  const [selectedLanguage, setSelectedLanguage] = useState('python'); // Default language is Python
+  const [generationTime, setGenerationTime] = useState(null);
+
+  const [selectedLanguage, setSelectedLanguage] = useState('Python'); // Default language is Python
+  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo'); // Default language is Python
   const [theme, setTheme] = useState('light'); // Default theme is light
 
   // Effect to trigger blip animation when isSummaryGenerating is true
@@ -39,51 +43,87 @@ const GenerateSummary = () => {
 
   // Function to handle "Generate Summary" button click
   const generateSummary = async () => {
+    const startTime = Date.now();
     setIsSummaryGenerating(true); // Set loading state to true
       try {
-        const payload = {
-          "model": "codellama:7b",
-          "prompt": "Describe the code very briefly in one sentence - " + codeSnippet,
-          "stream": false
-        };
+        // const payload = {
+        //   "model": "codellama:7b",
+        //   "prompt": "Describe the code very briefly in one sentence - " + codeSnippet,
+        //   "stream": false
+        // };
     
-        const response = await fetch('http://localhost:11434/api/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+        // const response = await fetch('http://localhost:11434/api/generate', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify(payload),
+        // });
+
+        const response = await axios.post('http://127.0.0.1:5000/generate-summary', {
+          codeLanguage: selectedLanguage,
+          codeSnippet: codeSnippet,
+          summarizationModel: selectedModel
         });
+
+        // console.log(response)
     
-        if (!response.  ok) {
-          throw new Error('Failed to generate summary');
+        if (response.data.status == 200) {
+          const summary = response.data.summary;
+          setSummary(summary);
+          setNaturalnessRating(3); // Average
+          setUsefulnessRating(3); // Average
+          setConsistencyRating(3); // Average
+          setIsRatingSectionOpen(true);
+        } else {
+          throw new Error('Failed to generate summary. Status: ' + response.status + ', Error: ' + response.error);
         }
-    
-        const responseData = await response.json();
-        setSummary(responseData.response);
-        setNaturalnessRating(3); // Average
-        setUsefulnessRating(3); // Average
-        setConsistencyRating(3); // Average
-        setIsRatingSectionOpen(true);
       } catch (error) {
         console.error('Error generating summary:', error);
       } finally {
+        const endTime = Date.now();
         setIsSummaryGenerating(false);
+        setSummaryGenerationTime(startTime, endTime);
       }
     };  
 
+  const setSummaryGenerationTime = (startTime, endTime) => {
+    const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+    setGenerationTime(timeTaken.toFixed(2)); // Round to 2 decimal places
+  };
+
   // Function to handle "Submit Rating" button click
-  const submitRating = () => {
+  const submitRating = async () => {
     // Placeholder logic: Send ratings to backend
     console.log('Naturalness Rating:', naturalnessRating);
     console.log('Usefulness Rating:', usefulnessRating);
     console.log('Consistency Rating:', consistencyRating);
-    setIsRatingSectionOpen(false);
 
+    try {
+
+      const response = await axios.post('http://127.0.0.1:5000/submit-feedback', {
+        user_id: userId,
+        language: selectedLanguage,
+        model: selectedModel,
+        code: codeSnippet,
+        summary: summary,
+        naturalness_rating: naturalnessRating,
+        usefulness_rating: usefulnessRating,
+        consistency_rating: consistencyRating
+      });
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+    }
+
+    setIsRatingSectionOpen(false);
   };
 
   const handleLanguageChange = (event) => {
     setSelectedLanguage(event.target.value);
+  };
+
+  const handleModelChange = (event) => {
+    setSelectedModel(event.target.value);
   };
 
   const toggleTheme = () => {
@@ -111,8 +151,22 @@ const GenerateSummary = () => {
           <MenuItem value="Java">Java</MenuItem>
         </Select>
       </div>
+      <div className="model-dropdown">
+        <label>Select Model: </label>
+        <Select
+          value={selectedModel}
+          onChange={handleModelChange}
+          renderValue={(value) => (
+            <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedModel}</span>
+          )}
+        >
+          <MenuItem value="gpt-3.5-turbo">gpt-3.5-turbo</MenuItem>
+          <MenuItem value="gpt-4">gpt-4</MenuItem>
+          <MenuItem value="gpt-4-turbo">gpt-4-turbo</MenuItem>
+        </Select>
+      </div>
       <Editor
-        language="python"
+        language={selectedLanguage.toLowerCase()}
         value={codeSnippet}
         onChange={handleCodeChange}
         options={{
@@ -133,9 +187,17 @@ const GenerateSummary = () => {
         {isSummaryGenerating ? (
           <p className="loading-message">Hold on a sec while I get your summary...</p>
         ) : (
-          <p className="summary">{summary}</p>
+          <>
+            <p className="summary">{summary}</p>
+            <div className="generation-time">
+              {generationTime !== null && (
+                <p>Summary generated in {generationTime} seconds.</p>
+              )}
+            </div>
+          </>
         )}
       </div>
+
       {/* Rating section */}
       <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
         <h2 className="rating-title">Rate the Summary:</h2>

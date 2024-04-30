@@ -215,5 +215,12 @@
   .theme-toggle.theme-toggle-dark {
     transform: rotate(180deg);
   }
+
+.language-dropdown,
+.model-dropdown {
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 20px; /* Adjust as needed */
+}
   
   

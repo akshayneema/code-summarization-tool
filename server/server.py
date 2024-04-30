@@ -4,9 +4,12 @@ from flask_cors import CORS
 from transformers import AutoTokenizer, AutoModelWithLMHead, SummarizationPipeline
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from functools import wraps
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 import requests
+from openai import OpenAI
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from all origins for all routes
@@ -18,6 +21,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tra
 app.config['JWT_SECRET_KEY'] = 'jwt_secret_key'
 jwt = JWTManager(app)
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+client = OpenAI()
 
 # Define User model
 class User(db.Model):
@@ -31,6 +37,22 @@ class User(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+# Define Feedback model
+class Feedback(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    language = db.Column(db.String(50), nullable=False)  # Add language column
+    model = db.Column(db.String(50), nullable=False)  # Add model column
+    code = db.Column(db.Text, nullable=False)  # Add code column
+    summary = db.Column(db.Text, nullable=False)  # Add summary column
+    naturalness_rating = db.Column(db.Integer, nullable=False)
+    usefulness_rating = db.Column(db.Integer, nullable=False)
+    consistency_rating = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Define a relationship with the User model
+    user = db.relationship('User', backref=db.backref('feedbacks', lazy=True))
     
 def create_admin_user():
     # Check if the admin user already exists
@@ -88,12 +110,12 @@ def register():
         return jsonify({'message': 'Username already exists'}), 409
 
     # Generate JWT token
-    access_token = create_access_token(identity=username)
     user = User(username=username, role=role)
     user.set_password(password)
+    access_token = create_access_token(identity=user.id)
     db.session.add(user)
     db.session.commit()
-    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token}), 201)
+    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token, 'user_id': user.id}), 201)
     return resp
 
 @app.route('/login', methods=['POST'])
@@ -110,10 +132,11 @@ def login():
         return jsonify({'message': 'Invalid username or password'}), 401
 
     # Generate JWT token
-    access_token = create_access_token(identity=username)
+    access_token = create_access_token(identity=user.id)
+    session['user_id'] = user.id
     session['username'] = username
     session['role'] = user.role
-    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token}), 200)
+    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token, 'user_id': user.id}), 200)
     return resp
 
 @app.route('/logout')
@@ -125,37 +148,56 @@ def logout():
 @jwt_required()
 def check_login():
     current_user = get_jwt_identity()
-    return jsonify({'message': 'Logged in as: ' + current_user, 'status': 'True'}), 200
+    # print("current user - ", current_user)
+    return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user}), 200
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():
     if request.method == 'POST':
         data = request.json  # Get the JSON data from the request
         code_snippet = data.get('codeSnippet')  # Retrieve the code snippet from the JSON data
+        code_language = data.get('codeLanguage')
+        summ_model = data.get('summarizationModel')
+
+        try:
+            completion = client.chat.completions.create(
+                model=summ_model,
+                messages=[
+                    {"role": "system", "content": "You are a code summarization assistant that generates concise yet informative natural language summaries to the code provided to you to best of your efforts."},
+                    {"role": "user", "content": f"Create natural language summary for the {code_language} code provided - {code_snippet}"}
+                ]
+            )
+
+            return jsonify({"summary": completion.choices[0].message.content, "status": 200})
+        except Exception as e:
+            # Handle the error
+            error_message = f"An error occurred while generating summary: {str(e)}"
+            print(error_message)
+            return jsonify({"error": error_message, "status": 500})
         
-        # Define the API endpoint URL
-        url = 'http://localhost:11434/api/generate'
+        # # Define the API endpoint URL
+        # url = 'http://localhost:11434/api/generate'
 
-        # Define the request payload (JSON data)
-        payload = {
-            "model": "codellama:7b",
-            "prompt": "Please geneate natural language summary for the code - " + code_snippet,
-            "format": "json",
-            "stream": False
-        }
+        # # Define the request payload (JSON data)
+        # payload = {
+        #     "model": "codellama:7b",
+        #     "prompt": "Please geneate natural language summary for the code - " + code_snippet,
+        #     "format": "json",
+        #     "stream": False
+        # }
 
-        # Make the POST request
-        response = requests.post(url, json=payload)
+        # # Make the POST request
+        # response = requests.post(url, json=payload)
 
-        # Check if the request was successful (status code 200)
-        if response.status_code == 200:
-            # Extract the JSON response
-            json_data = response.json()
-            # Process the JSON data as needed
-            return json_data['response']
-        else:
-            # Print the error message if the request failed
-            return f"Error: {response.status_code} - {response.text}", 500
+        # # Check if the request was successful (status code 200)
+        # if response.status_code == 200:
+        #     # Extract the JSON response
+        #     json_data = response.json()
+        #     # Process the JSON data as needed
+        #     return json_data['response']
+        # else:
+        #     # Print the error message if the request failed
+        #     return f"Error: {response.status_code} - {response.text}", 500
     
     elif request.method == 'OPTIONS':
         # Respond to OPTIONS requests with CORS headers
@@ -163,6 +205,55 @@ def generate_summary():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         response.headers.add('Access-Control-Allow-Methods', 'POST')
         return response
+    
+# Route for submitting feedback
+@app.route('/submit-feedback', methods=['POST', 'OPTIONS'])
+def submit_feedback():
+    if request.method == 'OPTIONS':
+        # Handle preflight request (CORS)
+        response = make_response()
+        response.headers['Access-Control-Allow-Methods'] = 'POST'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
+
+    # For POST requests, handle feedback submission as before
+    # Get feedback data from the request JSON
+    feedback_data = request.json
+
+    # Extract data from the JSON
+    user_id = feedback_data.get('user_id')
+    language = feedback_data.get('language')
+    model = feedback_data.get('model')
+    code = feedback_data.get('code')
+    summary = feedback_data.get('summary')
+    naturalness_rating = feedback_data.get('naturalness_rating')
+    usefulness_rating = feedback_data.get('usefulness_rating')
+    consistency_rating = feedback_data.get('consistency_rating')
+
+    # Create a new Feedback object
+    feedback = Feedback(
+        user_id=user_id,
+        language=language,
+        model=model,
+        code=code,
+        summary=summary,
+        naturalness_rating=naturalness_rating,
+        usefulness_rating=usefulness_rating,
+        consistency_rating=consistency_rating
+    )
+
+    # Add the feedback object to the database session
+    db.session.add(feedback)
+
+    try:
+        # Commit the session to save the feedback to the database
+        db.session.commit()
+        return jsonify({'message': 'Feedback submitted successfully'}), 200
+    except Exception as e:
+        # Rollback the session if an error occurs
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 
 import tokenize
 import io
