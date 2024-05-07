@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Editor } from '@monaco-editor/react'; 
 import { Select, MenuItem } from '@material-ui/core';
 import './GenerateSummary.css'; // Import CSS file for component styling
-import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
+import { useCookies } from 'react-cookie';
 
 const GenerateSummary = ({userId}) => {
   // State to store code snippet input
@@ -25,6 +25,7 @@ const GenerateSummary = ({userId}) => {
   const [selectedLanguage, setSelectedLanguage] = useState('Python'); // Default language is Python
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo'); // Default language is Python
   const [theme, setTheme] = useState('light'); // Default theme is light
+  const [cookies, setCookie] = useCookies(['jwtToken']);
 
   // Effect to trigger blip animation when isSummaryGenerating is true
   useEffect(() => {
@@ -46,27 +47,11 @@ const GenerateSummary = ({userId}) => {
     const startTime = Date.now();
     setIsSummaryGenerating(true); // Set loading state to true
       try {
-        // const payload = {
-        //   "model": "codellama:7b",
-        //   "prompt": "Describe the code very briefly in one sentence - " + codeSnippet,
-        //   "stream": false
-        // };
-    
-        // const response = await fetch('http://localhost:11434/api/generate', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify(payload),
-        // });
-
         const response = await axios.post('http://127.0.0.1:5000/generate-summary', {
           codeLanguage: selectedLanguage,
           codeSnippet: codeSnippet,
           summarizationModel: selectedModel
         });
-
-        // console.log(response)
     
         if (response.data.status == 200) {
           const summary = response.data.summary;
@@ -94,7 +79,6 @@ const GenerateSummary = ({userId}) => {
 
   // Function to handle "Submit Rating" button click
   const submitRating = async () => {
-    // Placeholder logic: Send ratings to backend
     console.log('Naturalness Rating:', naturalnessRating);
     console.log('Usefulness Rating:', usefulnessRating);
     console.log('Consistency Rating:', consistencyRating);
@@ -130,9 +114,19 @@ const GenerateSummary = ({userId}) => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
+  // Function to handle logout
+  const handleLogout = async () => {
+    setCookie('jwtToken', ''); // Remove the jwtToken cookie
+    const response = await axios.get('http://127.0.0.1:5000/logout');
+    window.location.reload(); // Reload the page
+  };
+
   return (
     <div className={`container ${theme === 'light' ? 'light-theme' : 'dark-theme'}`}>
       <h1 className="title">Code Summarization Tool</h1>
+      <div className="header">
+        <a className="logout-btn" onClick={handleLogout}>Logout</a>
+      </div>
       <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
         {theme === 'light' ? '🌞' : '🌙'}
       </div>

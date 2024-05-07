@@ -28,13 +28,13 @@
     position: relative;
   }
   
-  .icon {
+.icon {
     color: white;
     position: absolute;
     right: 10px;
-    top: 50%;
+    top: 18px;
     transform: translateY(-50%);
-  }
+}
 
 input {
     background: transparent;
