@@ -116,7 +116,7 @@ def register():
     access_token = create_access_token(identity=user.id)
     db.session.add(user)
     db.session.commit()
-    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token, 'user_id': user.id}), 201)
+    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token, 'user_id': user.id, 'role': user.role}), 201)
     return resp
 
 @app.route('/login', methods=['POST'])
@@ -137,7 +137,7 @@ def login():
     session['user_id'] = user.id
     session['username'] = username
     session['role'] = user.role
-    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token, 'user_id': user.id}), 200)
+    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token, 'user_id': user.id, 'role': user.role}), 200)
     return resp
 
 @app.route('/logout')
