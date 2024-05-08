@@ -6,8 +6,7 @@ const PieChartComp = () => {
     const data = [
         { name: 'Geeksforgeeks', rating: 400 },
         { name: 'Technical scripter', rating: 700 },
-        { name: 'Geek-i-knack', rating: 200 },
-        { name: 'Geek-o-mania', rating: 1000 }
+        { name: 'Geek-o-mania', rating: 600 }
     ];
 
     // Calculate total rating

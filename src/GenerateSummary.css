@@ -1,6 +1,10 @@
 body {
   overflow: hidden; /* Hide both horizontal and vertical scrollbars */
-  background-color: #f8f8f8;
+  /* background-color: #f8f8f8; */
+  background-image: url('skyblue.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 body {
@@ -12,12 +16,13 @@ body {
 .subtitle,
 .summary-title,
 .rating-label {
-  font-family: 'Lato', sans-serif; /* Set Lato font for titles and labels */
+  font-family: '', sans-serif; /* Set Roboto font for titles and labels */
 }
 
 .container {
   overflow-x: auto; /* Allow horizontal scrolling if needed */
   display: flex;
+  background: transparent;
 }
 
 .container {
@@ -41,22 +46,14 @@ body {
   font-size: 2em;
   color: #61dafb; /* Light blue */
   margin-bottom: 20px;
+  text-shadow: 0px 0px 8px rgba(0, 0, 0, 1); /* Blurry shadow effect */
+  -webkit-text-stroke: 1px #61dafb; /* Light blue border around the text */
+  padding: 10px; /* Add padding to make space for the border */
 }
+
 
 .rating-label {
   color: #333; /* Adjust the color as needed */
-}
-
-/* Light Theme */
-.light-theme {
-  background-color: #f8f8f8;
-  color: #333; /* Text color for light theme */
-}
-
-/* Dark Theme */
-.dark-theme {
-  background-color: #333;
-  color: #f8f8f8; /* Text color for dark theme */
 }
 
 /* Light Theme */
@@ -122,7 +119,7 @@ body {
   background-color: #61dafb; /* Light blue */
   color: #fff;
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1.2em;
   transition: background-color 0.3s ease;
@@ -140,7 +137,7 @@ body {
 
 
 .rating-container {
-  margin-top: 20px;
+  margin-top: 10px;
   padding: 20px;
   background-color: #fff; /* White background for rating container */
   border: 1px solid #ddd;
@@ -160,6 +157,7 @@ body {
 }
 
 .rating-title {
+  margin-top: 0px;
   margin-bottom: 10px;
   font-size: 1.5em;
   color: #61dafb; /* Light blue */
@@ -184,8 +182,8 @@ body {
   background-color: #fff; /* White background */
   border: 2px solid #61dafb; /* Light blue border */
   padding: 10px 20px;
-  border-radius: 30px;
-  font-size: 1.2em;
+  border-radius: 10px;
+  font-size: 1em;
   color: #61dafb; /* Light blue text */
   transition: background-color 0.3s ease;
 }
@@ -204,7 +202,7 @@ body {
   background-color: #61dafb; /* Light blue */
   color: #fff;
   border: none;
-  border-radius: 30px;
+  border-radius: 20px;
   cursor: pointer;
   font-size: 1.2em;
   transition: background-color 0.3s ease;
@@ -212,6 +210,11 @@ body {
 
 .submit-rating-btn:hover {
   background-color: #4b8be0; /* Darker blue on hover */
+}
+
+.submit-rating-btn:disabled {
+  background-color: #ccc; /* Change background color */
+  cursor: not-allowed; /* Change cursor */
 }
 
   /* Add blip animation */
@@ -226,6 +229,11 @@ body {
       opacity: 0;
     }
   }
+
+  .summary-container {
+    margin-top: 50px;
+  }
+  
   
   .summary-container.blip {
     animation: blip 1s ease infinite;
@@ -239,6 +247,7 @@ body {
   
   .generate-btn.disabled {
     background-color: #ccc;
+    cursor: not-allowed;
   }
   
   /* Add transition for theme toggle button */
@@ -310,7 +319,7 @@ body {
   background-color: #61dafb; /* Light blue */
   color: #fff;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -322,4 +331,20 @@ body {
 .generation-time {
   font-style: italic;
   color: #888; /* Adjust the color as needed */
+}
+
+.no-summary-placeholder {
+  font-style: italic;
+  color: #888; /* Adjust the color as needed */
+}
+
+.loading-message {
+  font-style: italic;
+  color: #888; /* Adjust the color as needed */
+}
+
+.file-upload-button,
+.generate-btn,
+.submit-rating-btn {
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
 }
