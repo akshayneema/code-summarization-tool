@@ -10,6 +10,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 import requests
 from openai import OpenAI
 from datetime import datetime
+from sqlalchemy import func
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Allow requests from all origins for all routes
@@ -253,6 +254,60 @@ def submit_feedback():
         # Rollback the session if an error occurs
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/average-ratings', methods=['GET'])
+@app.route('/average-ratings/<int:user_id>', methods=['GET'])
+def average_ratings(user_id=None):
+    # Check if user_id is provided
+    print(user_id)
+    if user_id:
+        # Query the database to calculate average ratings for the selected user
+        user_feedback_ratings = db.session.query(
+            User.id,
+            User.username,
+            func.avg(Feedback.naturalness_rating).label('avg_naturalness'),
+            func.avg(Feedback.usefulness_rating).label('avg_usefulness'),
+            func.avg(Feedback.consistency_rating).label('avg_consistency')
+        ).join(Feedback, User.id == Feedback.user_id).filter(User.id == user_id).group_by(User.id).first()
+
+        if not user_feedback_ratings:
+            return jsonify({'message': 'User feedback not found'}), 404
+
+        # Prepare the response data
+        ratings_data = {
+            'user_id': user_feedback_ratings[0],
+            'username': user_feedback_ratings[1],
+            'avg_naturalness': user_feedback_ratings[2],
+            'avg_usefulness': user_feedback_ratings[3],
+            'avg_consistency': user_feedback_ratings[4]
+        }
+
+        # Return the ratings data for the selected user as JSON
+        return jsonify(ratings_data)
+    else:
+        # Query the database to calculate average ratings across all users
+        average_ratings = db.session.query(
+            func.avg(Feedback.naturalness_rating).label('avg_naturalness'),
+            func.avg(Feedback.usefulness_rating).label('avg_usefulness'),
+            func.avg(Feedback.consistency_rating).label('avg_consistency')
+        ).first()
+
+        # Prepare the response data
+        ratings_data = {
+            'avg_naturalness': average_ratings[0],
+            'avg_usefulness': average_ratings[1],
+            'avg_consistency': average_ratings[2]
+        }
+
+        # Return the ratings data for all users as JSON
+        return jsonify(ratings_data)
+
+# Your existing code...
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 
 import tokenize
