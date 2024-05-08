@@ -1,15 +1,9 @@
 /* UserProfile.css */
 
 .user-profile-container {
+    color: black;
     display: flex;
     justify-content: space-between;
-    background-image: url('image.jpg');
-    background-size: cover;
-    min-height: 100vh;
-    background-position: center;
-    background-attachment: fixed;
-    padding: 20px; /* Example padding, adjust as needed */
-    box-sizing: border-box; /* Ensure padding is included in the height calculation */
 }
 
   
