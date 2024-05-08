@@ -7,6 +7,7 @@
     background-image: url('image.jpg');
     background-size: cover;
     background-position: center;
+    background-attachment: fixed;
 }
 
 .form-container {
@@ -28,13 +29,13 @@
     position: relative;
   }
   
-  .icon {
+.icon {
     color: white;
     position: absolute;
     right: 10px;
-    top: 50%;
+    top: 18px;
     transform: translateY(-50%);
-  }
+}
 
 input {
     background: transparent;

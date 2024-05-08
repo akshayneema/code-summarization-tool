@@ -60,6 +60,22 @@
     cursor: pointer;
     font-size: 24px;
   }
+
+  .header {
+    position: fixed;
+    top: 20px;
+    right: 60px;
+    cursor: pointer;
+    font-size: 24px;
+  }
+
+  .logout-btn {
+    color: deepskyblue
+  }
+
+  .logout-btn:hover {
+    text-decoration: underline;
+}
   
   .code-input {
     width: 100%;

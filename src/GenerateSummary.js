@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Editor } from '@monaco-editor/react'; 
 import { Select, MenuItem } from '@material-ui/core';
 import './GenerateSummary.css'; // Import CSS file for component styling
-import language from 'react-syntax-highlighter/dist/esm/languages/hljs/1c';
+import { useCookies } from 'react-cookie';
 
 const GenerateSummary = ({userId}) => {
   // State to store code snippet input
@@ -32,6 +32,7 @@ const GenerateSummary = ({userId}) => {
   const [selectedSummaryIndex, setSelectedSummaryIndex] = useState(0);
 
   const [theme, setTheme] = useState('light'); // Default theme is light
+  const [cookies, setCookie] = useCookies(['jwtToken']);
 
   // Effect to trigger blip animation when isSummaryGenerating is true
   useEffect(() => {
@@ -54,28 +55,12 @@ const GenerateSummary = ({userId}) => {
     setIsSummaryGenerating(true); // Set loading state to true
     setIsRatingSectionOpen(false);
       try {
-        // const payload = {
-        //   "model": "codellama:7b",
-        //   "prompt": "Describe the code very briefly in one sentence - " + codeSnippet,
-        //   "stream": false
-        // };
-    
-        // const response = await fetch('http://localhost:11434/api/generate', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify(payload),
-        // });
-
         const response = await axios.post('http://127.0.0.1:5000/generate-summary', {
           codeLanguage: selectedLanguage,
           codeSnippet: codeSnippet,
           summarizationModel: selectedModel,
           numSummaries: numSummaries
         });
-
-        // console.log(response)
     
         if (response.data.status == 200) {
           const summary = response.data.summary;
@@ -104,7 +89,6 @@ const GenerateSummary = ({userId}) => {
 
   // Function to handle "Submit Rating" button click
   const submitRating = async () => {
-    // Placeholder logic: Send ratings to backend
     console.log('Naturalness Rating:', naturalnessRating);
     console.log('Usefulness Rating:', usefulnessRating);
     console.log('Consistency Rating:', consistencyRating);
