@@ -1,0 +1,104 @@
+/* Register.css */
+
+.register-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('image.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.form-container {
+  padding: 50px; /* Increased padding */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 80%; /* Set the width to 80% of the container */
+  max-width: 300px; /* Set a maximum width */
+  margin: 0 auto; /* Center the form container horizontally */
+}
+
+.input-container {
+  margin-bottom: 20px;
+}
+
+.register-heading {
+  color: white;
+  text-align: center;
+}
+
+input {
+  background: transparent;
+  display: block;
+  width: calc(100% - 20px); /* Adjusted width */
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 16px;
+  color: white;
+}
+
+.icon {
+  color: white;
+  position: absolute;
+  right: 10px;
+  top: 18px;
+  transform: translateY(-50%);
+}
+
+/* Apply styles to the unordered list */
+ul.error-list {
+  color: orangered;
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+  font-size: small;
+}
+
+/* Apply styles to the list items */
+ul.error-list li {
+  margin-bottom: 5px; /* Add some space between each error message */
+}
+
+/* Apply styles to the asterisk */
+ul.error-list li:before {
+  content: '*'; /* Add asterisk before each error message */
+  margin-right: 5px; /* Add space between asterisk and error message */
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-password-error {
+  color: orangered;
+  font-size: small;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.account-exists {
+  margin-top: 10px;
+  font-size: 14px; /* Adjust font size */
+  color: white; /* Text color */
+}
+
+.login-link {
+  color: white; /* Link color */
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.login-link:hover {
+  text-decoration: none; /* Underline on hover */
+}

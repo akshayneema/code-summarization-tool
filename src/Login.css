@@ -1,0 +1,85 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('image.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.form-container {
+    padding: 50px; /* Increased padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%; /* Set the width to 80% of the container */
+    max-width: 300px; /* Set a maximum width */
+    margin: 0 auto; /* Center the form container horizontally */
+}
+
+
+.login-heading {
+    color: white;
+    text-align: center;
+}
+
+.input-container {
+    position: relative;
+  }
+  
+.icon {
+    color: white;
+    position: absolute;
+    right: 10px;
+    top: 18px;
+    transform: translateY(-50%);
+}
+
+input {
+    background: transparent;
+    display: block;
+    width: 80%; /* Set input width to 100% */
+    margin-bottom: 15px; /* Increased margin */
+    padding: 15px; /* Increased padding */
+    font-size: 18px; /* Increased font size */
+    color: white;
+}
+
+.error-message {
+    color: red;
+    margin-top: 5px;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 15px; /* Increased padding */
+    font-size: 18px; /* Increased font size */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px; /* Increased border radius */
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.no-account {
+    margin-top: 10px;
+    font-size: 14px; /* Adjust font size */
+    color: white; /* Text color */
+}
+
+.register-link {
+    color:white; /* Link color */
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.register-link:hover {
+    text-decoration: none; /* Underline on hover */
+}
