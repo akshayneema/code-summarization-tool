@@ -217,10 +217,64 @@
   }
 
 .language-dropdown,
-.model-dropdown {
+.model-dropdown,
+.num-summaries-dropdown {
   display: inline-block;
   vertical-align: top;
   margin-right: 20px; /* Adjust as needed */
 }
   
-  
+.textual-feedback-textarea {
+  width: calc(100% - 30px); /* Adjusted width to fit the component */
+  height: 150px; /* Fixed height */
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 2px solid #61dafb; /* Light blue border */
+  border-radius: 10px;
+  font-size: 1.2em;
+  background-color: #fff; /* White background for textbox */
+  color: #333; /* Dark text */
+  resize: none; /* Disable resizing */
+}
+
+.textual-feedback-textarea:focus {
+  outline: none; /* Remove focus outline */
+  border-color: #007bff; /* Lighter blue when focused */
+}
+
+.textual-feedback-textarea::placeholder {
+  color: #999; /* Light gray placeholder text */
+}
+
+.file-upload-container {
+  margin: 20px 0px 20px 0px;
+}
+
+.file-upload-label {
+  display: inline-block;
+  position: relative;
+}
+
+.file-upload-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-upload-button {
+  display: inline-block;
+  background-color: #61dafb; /* Light blue */
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.file-upload-info {
+  margin-left: 10px;
+  color: #333; /* Adjust the color as needed */
+}
