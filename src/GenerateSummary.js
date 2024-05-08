@@ -114,19 +114,9 @@ const GenerateSummary = ({userId}) => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
-  // Function to handle logout
-  const handleLogout = async () => {
-    setCookie('jwtToken', ''); // Remove the jwtToken cookie
-    const response = await axios.get('http://127.0.0.1:5000/logout');
-    window.location.reload(); // Reload the page
-  };
-
   return (
     <div className={`container ${theme === 'light' ? 'light-theme' : 'dark-theme'}`}>
       <h1 className="title">Code Summarization Tool</h1>
-      <div className="header">
-        <a className="logout-btn" onClick={handleLogout}>Logout</a>
-      </div>
       <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
         {theme === 'light' ? '🌞' : '🌙'}
       </div>
