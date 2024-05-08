@@ -180,9 +180,9 @@ const GenerateSummary = ({userId}) => {
     <div className={`container ${theme === 'light' ? 'light-theme' : 'dark-theme'}`}>
       <div className="left-panel">
         <h1 className="title">Input Code</h1>
-        <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
+        {/* <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
           {theme === 'light' ? '🌞' : '🌙'}
-        </div>
+        </div> */}
         {/* Input area for code snippet */}
         <div className="language-dropdown">
           <label>Select Language: </label>
@@ -357,6 +357,7 @@ const GenerateSummary = ({userId}) => {
           </div>
           <textarea
             className={`textual-feedback-textarea ${theme === 'dark' ? 'dark-mode' : ''}`}
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px' }}
             placeholder="Additional feedback..."
             value={textualFeedback}
             onChange={handleTextualFeedbackChange}
