@@ -18,6 +18,8 @@ const GenerateSummary = ({userId}) => {
   const [usefulnessRating, setUsefulnessRating] = useState(3); // Default: Average
   const [consistencyRating, setConsistencyRating] = useState(3); // Default: Average
   const [textualFeedback, setTextualFeedback] = useState('');
+  const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
+
 
   // State to track whether a summary is generated
   const [isRatingSectionOpen, setIsRatingSectionOpen] = useState(false);
@@ -44,6 +46,12 @@ const GenerateSummary = ({userId}) => {
       setIsBlip(false);
     }
   }, [isSummaryGenerating]);
+
+  useEffect(() => {
+      // Reset isFeedbackSubmitted when a new summary is generated or a different summary is selected
+      setIsFeedbackSubmitted(false);
+  }, [selectedSummaryIndex, summary]);
+
 
   // Function to handle code snippet input change
   const handleCodeChange = (value) => {
@@ -108,6 +116,13 @@ const GenerateSummary = ({userId}) => {
         consistency_rating: consistencyRating,
         textual_feedback: textualFeedback // Include textual feedback
       });
+
+      setIsFeedbackSubmitted(true);
+      // Reset ratings to default values
+      setNaturalnessRating(3);
+      setUsefulnessRating(3);
+      setConsistencyRating(3);
+      setTextualFeedback('');
     } catch (error) {
       console.error('Error submitting feedback:', error);
     }
@@ -251,34 +266,42 @@ const GenerateSummary = ({userId}) => {
       <div className="right-panel">
         <h1 className="title">Generated Summary</h1>
         <div className={`summary-container ${isBlip ? 'blip' : ''}`}>
-          {isSummaryGenerating ? (
-            <p className="loading-message">Hold on a sec while I get your summary...</p>
-          ) : (
-            <>
-              {summary.length > 0 && (
-                <div className="summary-dropdown">
-                  <label>Select Summary:</label>
-                  <Select
-                    value={selectedSummaryIndex}
-                    onChange={handleSelectedSummaryChange}
-                    renderValue={(value) => (
-                      <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>Summary {value+1}</span>
-                    )}
-                  >
-                    {summary.map((_, index) => (
-                      <MenuItem key={index} value={index}>{`Summary ${index + 1}`}</MenuItem>
-                    ))}
-                  </Select>
-                </div>
-              )} 
-              <p className="summary">{summary[selectedSummaryIndex]}</p>
-              <div className="generation-time">
-                {generationTime !== null && (
-                  <p>Summary generated in {generationTime} seconds.</p>
+        {isSummaryGenerating ? (
+      <p className="loading-message">Hold on a sec while I get your summary...</p>
+    ) : (
+      <>
+        {summary.length > 0 ? (
+          <>
+            <div className="summary-dropdown">
+              <label>Select Summary: </label>
+              <Select
+                value={selectedSummaryIndex}
+                onChange={handleSelectedSummaryChange}
+                renderValue={(value) => (
+                  <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>Summary {value+1}</span>
                 )}
-              </div>
-            </>
-          )}
+              >
+                {summary.map((_, index) => (
+                  <MenuItem key={index} value={index}>{`Summary ${index + 1}`}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <p className="summary">{summary[selectedSummaryIndex]}</p>
+            <div className="generation-time">
+              {generationTime !== null && (
+                <p>Summary generated in {generationTime} seconds.</p>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="no-summary-placeholder">
+            {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
+            <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+            <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
+          </div>
+        )}
+      </>
+    )}
         </div>
 
         {/* Rating section */}
@@ -339,7 +362,13 @@ const GenerateSummary = ({userId}) => {
             onChange={handleTextualFeedbackChange}
           />
           {/* Submit rating button */}
-          <button className={`submit-rating-btn ${theme === 'dark' ? 'dark-mode-btn' : ''}`} onClick={submitRating}>Submit Rating</button>
+          <button 
+              className={`submit-rating-btn ${theme === 'dark' ? 'dark-mode-btn' : ''}`} 
+              onClick={submitRating}
+              disabled={isFeedbackSubmitted} // Disable button if feedback is already submitted
+          >
+              {isFeedbackSubmitted ? 'Submitted' : 'Submit Rating'}
+          </button>
         </div>
       </div>
     </div>
