@@ -50,6 +50,7 @@ class Feedback(db.Model):
     naturalness_rating = db.Column(db.Integer, nullable=False)
     usefulness_rating = db.Column(db.Integer, nullable=False)
     consistency_rating = db.Column(db.Integer, nullable=False)
+    textual_feedback = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Define a relationship with the User model
@@ -159,6 +160,7 @@ def generate_summary():
         code_snippet = data.get('codeSnippet')  # Retrieve the code snippet from the JSON data
         code_language = data.get('codeLanguage')
         summ_model = data.get('summarizationModel')
+        num_summ = data.get('numSummaries')
 
         try:
             completion = client.chat.completions.create(
@@ -166,10 +168,11 @@ def generate_summary():
                 messages=[
                     {"role": "system", "content": "You are a code summarization assistant that generates concise yet informative natural language summaries to the code provided to you to best of your efforts."},
                     {"role": "user", "content": f"Create natural language summary for the {code_language} code provided - {code_snippet}"}
-                ]
+                ],
+                n=num_summ
             )
 
-            return jsonify({"summary": completion.choices[0].message.content, "status": 200})
+            return jsonify({"summary": [gen.message.content for gen in completion.choices], "status": 200})
         except Exception as e:
             # Handle the error
             error_message = f"An error occurred while generating summary: {str(e)}"
@@ -230,6 +233,7 @@ def submit_feedback():
     naturalness_rating = feedback_data.get('naturalness_rating')
     usefulness_rating = feedback_data.get('usefulness_rating')
     consistency_rating = feedback_data.get('consistency_rating')
+    textual_feedback = feedback_data.get('textual_feedback')
 
     # Create a new Feedback object
     feedback = Feedback(
@@ -240,7 +244,8 @@ def submit_feedback():
         summary=summary,
         naturalness_rating=naturalness_rating,
         usefulness_rating=usefulness_rating,
-        consistency_rating=consistency_rating
+        consistency_rating=consistency_rating,
+        textual_feedback=textual_feedback
     )
 
     # Add the feedback object to the database session
