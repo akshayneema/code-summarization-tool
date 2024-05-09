@@ -15,6 +15,9 @@
     margin: 0 auto; /* Center the form container horizontally */
 }
 
+.login-button {
+    color: white;
+}
 
 .login-heading {
     color: white;
@@ -46,6 +49,10 @@ input {
 .error-message {
     color: red;
     margin-top: 5px;
+}
+
+.success-message {
+    color: white;
 }
 
 button {

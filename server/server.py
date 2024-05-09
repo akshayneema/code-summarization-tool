@@ -30,6 +30,7 @@ client = OpenAI()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=False)
 
@@ -101,17 +102,18 @@ def register():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    email = data.get('email')
     role = data.get('role')
 
     if not username or not password or not role:
-        return jsonify({'message': 'Missing username, password, or role'}), 400
+        return jsonify({'message': 'Missing username, email, password, or role'}), 400
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
         return jsonify({'message': 'Username already exists'}), 409
 
     # Generate JWT token
-    user = User(username=username, role=role)
+    user = User(username=username, email=email, role=role)
     user.set_password(password)
     access_token = create_access_token(identity=user.id)
     db.session.add(user)
@@ -149,8 +151,12 @@ def logout():
 @jwt_required()
 def check_login():
     current_user = get_jwt_identity()
-    # print("current user - ", current_user)
-    return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user}), 200
+    user_data = db.session.query(
+                User.username,
+                User.role,
+                User.email
+            ).filter(User.id == current_user).first()
+    return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user, 'username': user_data[0], 'role': user_data[1], 'email': user_data[2]}), 200
 
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():
@@ -258,29 +264,42 @@ def submit_feedback():
 
 @app.route('/average-ratings', methods=['GET'])
 @app.route('/average-ratings/<int:user_id>', methods=['GET'])
+@jwt_required()
 def average_ratings(user_id=None):
     # Check if user_id is provided
-    print(user_id)
     if user_id:
         # Query the database to calculate average ratings for the selected user
         user_feedback_ratings = db.session.query(
             User.id,
             User.username,
+            User.email,
             func.avg(Feedback.naturalness_rating).label('avg_naturalness'),
             func.avg(Feedback.usefulness_rating).label('avg_usefulness'),
             func.avg(Feedback.consistency_rating).label('avg_consistency')
         ).join(Feedback, User.id == Feedback.user_id).filter(User.id == user_id).group_by(User.id).first()
 
         if not user_feedback_ratings:
-            return jsonify({'message': 'User feedback not found'}), 404
+            user_data = db.session.query(
+                User.username,
+                User.email
+            ).filter(User.id == user_id).first()
+            if not user_data:
+                return jsonify({ 'message': 'User data not found'} )
+            errorReponse = {
+                'message': 'User feedback not found',
+                'username': user_data[0],
+                'email': user_data[1]
+            }
+            return jsonify(errorReponse), 200
 
         # Prepare the response data
         ratings_data = {
             'user_id': user_feedback_ratings[0],
             'username': user_feedback_ratings[1],
-            'avg_naturalness': user_feedback_ratings[2],
-            'avg_usefulness': user_feedback_ratings[3],
-            'avg_consistency': user_feedback_ratings[4]
+            'email': user_feedback_ratings[2],
+            'avg_naturalness': user_feedback_ratings[3],
+            'avg_usefulness': user_feedback_ratings[4],
+            'avg_consistency': user_feedback_ratings[5]
         }
 
         # Return the ratings data for the selected user as JSON
