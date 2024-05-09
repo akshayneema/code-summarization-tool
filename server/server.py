@@ -159,6 +159,29 @@ def check_login():
             ).filter(User.id == current_user).first()
     return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user, 'username': user_data[0], 'role': user_data[1], 'email': user_data[2]}), 200
 
+@app.route('/update-profile', methods=['POST'])
+@jwt_required()
+def update_profile():
+    data = request.json
+    username = data.get('username')
+    email = data.get('email')
+    user_id = get_jwt_identity()
+
+    # Retrieve the user from the database based on user_id
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'message': 'User not found', 'status': 'False'}), 404
+
+    # Update the user's username and email if provided
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+
+    # Commit the changes to the database
+    db.session.commit()
+
+    return jsonify({'message': 'Profile updated successfully', 'status': 'True'}), 200
 
 @app.route('/generate-random-fact', methods=['POST', 'OPTIONS'])
 def generate_random_fact():
