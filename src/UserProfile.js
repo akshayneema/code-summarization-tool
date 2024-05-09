@@ -4,11 +4,16 @@ import BarGraphComp from './BarGraphComp'; // Import component to display bar gr
 import './UserProfile.css'; // Import CSS file for styling
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
+import Select from 'react-select'; // Import React Select
 
 const UserProfile = ( {user_id} ) => {
   // Destructure the props to extract userData, pieChartData, and barGraphData
   const [ userData, setUserData ] = useState({});
   const [ ratingData, setRatingData ] = useState([]);
+
+  const [selectedFeedback, setSelectedFeedback] = useState(null); // State to store selected feedback
+  const [feedbackMap, setFeedbackMap] = useState({}); 
+
   const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
 
   useEffect(() => {
@@ -16,21 +21,21 @@ const UserProfile = ( {user_id} ) => {
     setRatingData([]);
     if (cookies.jwtToken) {
       getUserRatingsData()
+      getUserFeedbacks(user_id);
     }
   }, [cookies.jwtToken]);
 
   const getUserRatingsData = async () => {
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/average-ratings/${user_id}`, {
+      const response = await axios.post(`http://127.0.0.1:5000/feedback-averages`, {
+        user_id_list: [user_id], // Pass user ids in the request body
+      },
+      {
         headers: {
-          Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
+          Authorization: `Bearer ${cookies.jwtToken}`,
         },
       });
-      if (response.data && response.data.username) {
-        setUserData({
-            "username": response.data.username || "",
-            "email": response.data.email || ""
-        });
+      if (response.data && response.data.avg_naturalness) {
         const naturalness = {
             'name': 'Average Naturalness',
             'rating': response.data.avg_naturalness
@@ -56,9 +61,32 @@ const UserProfile = ( {user_id} ) => {
     }
   };
 
+  const getUserFeedbacks = async (user_id) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:5000/user/${user_id}/get-feedbacks`);
+        const feedbacks = response.data;
+
+        // Create a map of feedback IDs to feedback objects
+        const feedbacksMap = {};
+        feedbacks.forEach((feedback) => {
+            feedbacksMap[feedback.id] = feedback;
+        });
+
+        // Assuming setFeedbacksMap is a function to set the feedbacks map in your UI
+        setFeedbackMap(feedbacksMap);
+    } catch (error) {
+        console.error('Error fetching user feedbacks:', error);
+    }
+  };
+
+  const handleFeedbackSelect = (selectedOption) => {
+    setSelectedFeedback(selectedOption);
+  };
+
   return (
     <div className="user-profile-container">
-      {/* Display user data */}
+      <div className="data-feedback-container">
+        {/* Display user data */}
       {userData && (
         <div className="user-data-container">
             <h2>User Data:</h2>
@@ -66,6 +94,34 @@ const UserProfile = ( {user_id} ) => {
             <p>Email: {userData.email}</p>
         </div>
         )}
+
+      <div className="feedback-container">
+          <h2>Feedback History:</h2>
+          <Select
+            value={selectedFeedback}
+            onChange={handleFeedbackSelect}
+            options={Object.values(feedbackMap).map(feedback => ({
+              value: feedback.id,
+              label: `Feedback ${feedback.id}`
+            }))}
+          />
+          {selectedFeedback && feedbackMap[selectedFeedback.value] && (
+            <div className="feedback-details">
+              <h3>Feedback Details:</h3>
+              <p>Language: {feedbackMap[selectedFeedback.value].language}</p>
+              <p>Model: {feedbackMap[selectedFeedback.value].model}</p>
+              <p>Code: {feedbackMap[selectedFeedback.value].code}</p>
+              <p>Summary: {feedbackMap[selectedFeedback.value].summary}</p>
+              <p>Naturalness Rating: {feedbackMap[selectedFeedback.value].naturalness_rating}</p>
+              <p>Usefulness Rating: {feedbackMap[selectedFeedback.value].usefulness_rating}</p>
+              <p>Consistency Rating: {feedbackMap[selectedFeedback.value].consistency_rating}</p>
+              <p>Textual Feedback: {feedbackMap[selectedFeedback.value].textual_feedback}</p>
+              <p>Created At: {feedbackMap[selectedFeedback.value].created_at}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      
       
       {/* Display pie chart */}
       <div className="charts-container">

@@ -1,44 +1,64 @@
 /* UserProfile.css */
 
+/* UserProfile.css */
+
 .user-profile-container {
-    color: black;
-    display: flex;
-    justify-content: space-between;
+  color: black;
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  height: 100vh; /* Set a fixed height for the container */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+.data-feedback-container {
+  flex: 1; /* Make the container take up remaining space */
+  margin-right: 20px; /* Add margin to separate from charts */
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Set a fixed width for the charts container */
+  height: 100%; /* Set a fixed height for the container */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+.user-data-container {
+  margin-bottom: 20px; /* Add some bottom margin */
+}
+
+.feedback-container {
+  margin-bottom: 20px; /* Add margin between user data and feedbacks */
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Set a fixed width for the charts container */
+}
+
+.pie-chart-container,
+.bar-graph-container {
+  flex: 1;
+}
+
+.pie-chart,
+.bar-graph {
+  margin: 10px;
 }
 
   
-  .user-data-container {
-    flex: 1;
-    margin-left: 30px;
-  }
-  
-  .charts-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .pie-chart-container,
-  .bar-graph-container {
-    flex: 1;
-  }
-  
-  .pie-chart,
-  .bar-graph {
-    margin: 10px;
-  }
-  
 
-  .login-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-image: url('image.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .no-data-message {

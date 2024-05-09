@@ -202,8 +202,7 @@ def generate_random_fact():
             completion = client.chat.completions.create(
                 model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please."},
-                    {"role": "user", "content": f"Did you know..."}
+                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please. Start the fact as - Did you know..."}
                 ]
             )
 
@@ -328,7 +327,23 @@ def submit_feedback():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
+@app.route('/user/<int:user_id>/get-feedbacks')
+def get_feedbacks(user_id):
+    feedbacks = Feedback.query.filter_by(user_id=user_id).all()
+    feedbacks_data = [{
+        'id': feedback.id,
+        'language': feedback.language,
+        'model': feedback.model,
+        'code': feedback.code,
+        'summary': feedback.summary,
+        'naturalness_rating': feedback.naturalness_rating,
+        'usefulness_rating': feedback.usefulness_rating,
+        'consistency_rating': feedback.consistency_rating,
+        'textual_feedback': feedback.textual_feedback,
+        'created_at': feedback.created_at
+    } for feedback in feedbacks]
 
+    return jsonify(feedbacks_data)
 
 @app.route('/feedback-averages', methods=['POST'])
 def feedback_averages():

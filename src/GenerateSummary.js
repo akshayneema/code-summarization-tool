@@ -338,7 +338,7 @@ const GenerateSummary = ({userId}) => {
               <div className="no-summary-placeholder">
                 <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
                 <p className="random-fact-message">By the time you generate a summary, enjoy this interesting fact - </p>
-                <p className="random-fact">Did you know... {randomFact}</p>
+                <p className="random-fact">{randomFact}</p>
               </div>
             ) : (
               <div className="no-summary-placeholder">
