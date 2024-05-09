@@ -128,7 +128,6 @@ const handleUpdate = async () => {
   return (
     <div className="user-profile-container">
       <div className="data-feedback-container">
-        {/* Display user data */}
        {/* Display user data */}
     {userName && (
       <div className="user-data-container">
@@ -194,11 +193,7 @@ const handleUpdate = async () => {
         <div className="pie-chart-container">
           <h2>Pie Chart:</h2>
           <div>
-            {ratingData ? (
-                <PieChartComp data={ratingData} />
-            ) : (
-                <p>No data available</p>
-            )}
+            <PieChartComp data={ratingData} />
           </div>
         </div>
         
@@ -206,11 +201,7 @@ const handleUpdate = async () => {
         <div className="bar-graph-container">
           <h2>Bar Graph:</h2>
           <div>
-            {ratingData ? (
-                <BarGraphComp data={ratingData} />
-            ) : (
-                <p>No data available</p>
-            )}
+            <BarGraphComp data={ratingData} />
           </div>
         </div>
       </div>

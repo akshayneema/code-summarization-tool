@@ -30,6 +30,12 @@
   font-size: medium;
 }
 
+.success-message {
+  font-size: medium;
+  font-weight: bold;
+  color: black;
+}
+
 .admin-data-item h3 {
   margin-right: 10px;
 }
@@ -58,4 +64,9 @@
 .pie-chart,
 .bar-graph {
   margin: 10px;
+}
+
+.no-data-message {
+  font-weight: bold;
+  font-size: large;
 }

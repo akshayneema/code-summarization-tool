@@ -16,6 +16,16 @@ const [emailError, setEmailError] = useState('');
 const [selectedUsers, setSelectedUsers] = useState([]); 
 const [userOptions, setUserOptions] = useState([]);
 const [ successMessage, setSuccessMessage] = useState(false);
+const [newUserName, setNewUserName] = useState('');
+const [newUserEmail, setNewUserEmail] = useState('');
+const [newUserEmailError, setNewUserEmailError] = useState('');
+const [ addUserSuccessMessage, setAddUserSuccessMessage] = useState(false);
+const [ addUserErrorMessage, setAddUserErrorMessage] = useState('');
+const [newAdminName, setNewAdminName] = useState('');
+const [newAdminEmail, setNewAdminEmail] = useState('');
+const [newAdminEmailError, setNewAdminEmailError] = useState('');
+const [ addAdminSuccessMessage, setAddAdminSuccessMessage] = useState(false);
+const [ addAdminErrorMessage, setAddAdminErrorMessage] = useState('');
 
 useEffect(() => {
   setRatingData([]);
@@ -33,12 +43,42 @@ const handleEmailChange = (e) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // Check if inputEmail matches the emailRegex
     setAdminEmail(inputEmail);
-    if (emailRegex.test(inputEmail)) {
+    if (inputEmail == '' || emailRegex.test(inputEmail)) {
       // If valid, update the email state
       setEmailError('');
     } else {
       // If not valid, you may show an error message or handle it as per your requirement
       setEmailError('Please enter a valid email');
+    }
+  };
+
+const handleNewUserEmailChange = (e) => {
+    const inputEmail = e.target.value;
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Check if inputEmail matches the emailRegex
+    setNewUserEmail(inputEmail);
+    if (inputEmail == '' || emailRegex.test(inputEmail)) {
+      // If valid, update the email state
+      setNewUserEmailError('');
+    } else {
+      // If not valid, you may show an error message or handle it as per your requirement
+      setNewUserEmailError('Please enter a valid email');
+    }
+  };
+
+const handleNewAdminEmailChange = (e) => {
+    const inputEmail = e.target.value;
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Check if inputEmail matches the emailRegex
+    setNewAdminEmail(inputEmail);
+    if (inputEmail == '' || emailRegex.test(inputEmail)) {
+      // If valid, update the email state
+      setNewAdminEmailError('');
+    } else {
+      // If not valid, you may show an error message or handle it as per your requirement
+      setNewAdminEmailError('Please enter a valid email');
     }
   };
 
@@ -65,6 +105,62 @@ const handleUpdate = async () => {
     }
   };
 
+const handleAddUserOrAdmin = async (username, email, role) => {
+    const response = await axios.post(
+        'http://127.0.0.1:5000/register',
+        { 'username': username, 'email': email, 'password': 'password', 'role': role }, // Request body
+    );
+    if (response.data && response.data.status == 'True') {
+        if (role == 'admin') {
+            setAddAdminSuccessMessage(true);
+            setTimeout(() => {
+                setAddAdminSuccessMessage(false);
+            }, 2000);
+            setNewAdminName('');
+            setNewAdminEmail('');
+        } else {
+            setAddUserSuccessMessage(true);
+            setTimeout(() => {
+                setAddUserSuccessMessage(false);
+            }, 2000);
+            setNewUserName('');
+            setNewUserEmail('');
+        }
+    } else {
+        if (response.data && response.data.message) {
+            if (role == 'admin') {
+                setAddAdminErrorMessage(response.data.message);
+                setTimeout(() => {
+                    setAddAdminErrorMessage('');
+                }, 2000);
+            } else {
+                setAddUserErrorMessage(response.data.message);
+                setTimeout(() => {
+                    setAddUserErrorMessage('');
+                }, 2000);
+            }
+        }
+    }
+}
+
+// Function to handle adding new user
+const handleAddUser =  () => {
+    if (newUserEmailError) {
+        console.log("Please enter a valid email before proceeding");
+    } else {
+        handleAddUserOrAdmin(newUserName, newUserEmail, 'user');
+    }
+  };
+
+// Function to handle adding new user
+const handleAddAdmin =  () => {
+    if (newAdminEmailError) {
+        console.log("Please enter a valid email before proceeding");
+    } else {
+        handleAddUserOrAdmin(newAdminName, newAdminEmail, 'admin');
+    }
+  };
+
 const getUserRatingsData = async () => {
   try {
     const userIds = selectedUsers.map(user => user.value); // Extract user ids from selectedUsers
@@ -79,7 +175,7 @@ const getUserRatingsData = async () => {
         },
       }
     );
-    if (response.data && response.data.avg_naturalness) {
+    if (response.data) {
       const naturalness = {
           'name': 'Average Naturalness',
           'rating': response.data.avg_naturalness
@@ -158,7 +254,65 @@ return (
       {emailError && <p className="error-message">{emailError}</p>}
       {/* Button to update admin data */}
       <button onClick={handleUpdate} className='update-button'>Update</button>
-      {successMessage && <p>Admin profile updated successfully</p> }
+      {successMessage && <p className='success-message'>Admin profile updated successfully</p> }
+
+      <h2>Add New User:</h2>
+        {/* Name input field */}
+        <div className="admin-data-item">
+            <h3>User Name:</h3>
+            <input
+            type="text"
+            placeholder="Enter name"
+            className="input-name"
+            value={newUserName}
+            onChange={(e) => setNewUserName(e.target.value)}
+            />
+        </div>
+        {/* Email input field */}
+        <div className="admin-data-item">
+            <h3>User Email:</h3>
+            <input
+            type="email"
+            placeholder="Enter email"
+            className="input-email"
+            value={newUserEmail}
+            onChange={handleNewUserEmailChange}
+            />
+        </div>
+      {newUserEmailError && <p className="error-message">{newUserEmailError}</p>}
+      {addUserErrorMessage && <p className="error-message">{addUserErrorMessage}</p>}
+      {/* Button to update admin data */}
+      <button onClick={handleAddUser} className='update-button'>Add User</button>
+      {addUserSuccessMessage && <p className='success-message'>New user created successfully</p> }
+
+      <h2>Add New Admin:</h2>
+        {/* Name input field */}
+        <div className="admin-data-item">
+            <h3>Admin Name:</h3>
+            <input
+            type="text"
+            placeholder="Enter name"
+            className="input-name"
+            value={newAdminName}
+            onChange={(e) => setNewAdminName(e.target.value)}
+            />
+        </div>
+        {/* Email input field */}
+        <div className="admin-data-item">
+            <h3>Admin Email:</h3>
+            <input
+            type="email"
+            placeholder="Enter email"
+            className="input-email"
+            value={newAdminEmail}
+            onChange={handleNewAdminEmailChange}
+            />
+        </div>
+      {newAdminEmailError && <p className="error-message">{newAdminEmailError}</p>}
+      {addAdminErrorMessage && <p className="error-message">{addAdminErrorMessage}</p>}
+      {/* Button to update admin data */}
+      <button onClick={handleAddAdmin} className='update-button'>Add Admin</button>
+      {addAdminSuccessMessage && <p className='success-message'>New admin created successfully</p> }
     </div>
       )}
     
@@ -186,11 +340,7 @@ return (
       <div className="pie-chart-container">
         <h2>Pie Chart:</h2>
         <div>
-          {ratingData ? (
-              <PieChartComp data={ratingData} />
-          ) : (
-              <p>No data available</p>
-          )}
+            <PieChartComp data={ratingData} />
         </div>
       </div>
       
@@ -198,11 +348,7 @@ return (
       <div className="bar-graph-container">
         <h2>Bar Graph:</h2>
         <div>
-          {ratingData ? (
-              <BarGraphComp data={ratingData} />
-          ) : (
-              <p>No data available</p>
-          )}
+            <BarGraphComp data={ratingData} />
         </div>
       </div>
     </div>

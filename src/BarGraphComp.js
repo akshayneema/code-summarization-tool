@@ -13,7 +13,7 @@ const BarGraphComp = ({ data }) => {
     const yAxisDomain = [0, Math.ceil(maxRating * 1.1)]; // Adjust the multiplier as needed
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 600, height: 400 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400, marginTop: '50px' }}>
             {totalRating > 0 ? (
                 <BarChart width={600} height={400} data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -29,7 +29,7 @@ const BarGraphComp = ({ data }) => {
                 </BarChart>
             ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <span>No data available</span>
+                    <span className='no-data-message'>No data available</span>
                 </div>
             )}
         </div>

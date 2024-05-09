@@ -33,6 +33,7 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=True)
     password_hash = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=False)
+    first_login = db.Column(db.String(20), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -107,11 +108,11 @@ def register():
     role = data.get('role')
 
     if not username or not password or not role:
-        return jsonify({'message': 'Missing username, email, password, or role'}), 400
+        return jsonify({'status': 'False', 'message': 'Missing user details'}), 200
 
     existing_user = User.query.filter_by(username=username).first()
     if existing_user:
-        return jsonify({'message': 'Username already exists'}), 409
+        return jsonify({'status':'False', 'message': 'Username already exists'}), 200
 
     # Generate JWT token
     user = User(username=username, email=email, role=role)
@@ -119,7 +120,7 @@ def register():
     access_token = create_access_token(identity=user.id)
     db.session.add(user)
     db.session.commit()
-    resp = make_response(jsonify({'message': 'User registered successfully', 'access_token': access_token, 'user_id': user.id, 'role': user.role}), 201)
+    resp = make_response(jsonify({'status':'True', 'message': 'User registered successfully', 'access_token': access_token, 'user_id': user.id, 'role': user.role}), 201)
     return resp
 
 @app.route('/login', methods=['POST'])
@@ -140,7 +141,15 @@ def login():
     session['user_id'] = user.id
     session['username'] = username
     session['role'] = user.role
-    resp = make_response(jsonify({'message': 'Login successful', 'access_token': access_token, 'user_id': user.id, 'role': user.role}), 200)
+
+    response = {'message': 'Login successful', 'access_token': access_token, 'user_id': user.id, 'role': user.role, 'first_login': 'False'}
+
+    if user.role == 'admin' and not user.first_login:
+        response['first_login'] = 'True'
+        user.first_login = 'False'
+        db.session.commit()
+
+    resp = make_response(jsonify(response), 200)
     return resp
 
 @app.route('/logout')
