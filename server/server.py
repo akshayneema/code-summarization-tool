@@ -190,7 +190,7 @@ def generate_random_fact():
             completion = client.chat.completions.create(
                 model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are an interesting fact generator."},
+                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please."},
                     {"role": "user", "content": f"Did you know..."}
                 ]
             )
@@ -443,8 +443,6 @@ def user_all_summaries(user_id):
     return jsonify({'user_id': user.id, 'username': user.username, 'summaries': user_summaries})
 
 
-
-# Your existing code...
 
 if __name__ == '__main__':
     app.run(debug=True)
