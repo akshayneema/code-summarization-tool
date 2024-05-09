@@ -30,7 +30,7 @@ client = OpenAI()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=True)
     password_hash = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=False)
 
@@ -62,7 +62,7 @@ def create_admin_user():
     admin_user = User.query.filter_by(username='admin').first()
     if not admin_user:
         # Create the admin user with default username and password
-        admin = User(username='username', role='admin')
+        admin = User(username='admin', role='admin')
         admin.set_password('admin')  # Set default password
         db.session.add(admin)
         db.session.commit()
