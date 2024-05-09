@@ -153,6 +153,33 @@ def check_login():
     # print("current user - ", current_user)
     return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user}), 200
 
+
+@app.route('/generate-random-fact', methods=['POST', 'OPTIONS'])
+def generate_random_fact():
+    if request.method == 'POST':
+        try:
+            completion = client.chat.completions.create(
+                model='gpt-3.5-turbo',
+                messages=[
+                    {"role": "system", "content": "You are an interesting fact generator."},
+                    {"role": "user", "content": f"Did you know..."}
+                ]
+            )
+
+            return jsonify({"fact": completion.choices[0].message.content, "status": 200})
+        except Exception as e:
+            # Handle the error
+            error_message = f"An error occurred while generating fact: {str(e)}"
+            print(error_message)
+            return jsonify({"error": error_message, "status": 500})
+    
+    elif request.method == 'OPTIONS':
+        # Respond to OPTIONS requests with CORS headers
+        response = jsonify({'message': 'CORS preflight handled'})
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():
     if request.method == 'POST':

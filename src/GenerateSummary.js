@@ -11,6 +11,8 @@ const GenerateSummary = ({userId}) => {
   const [codeSnippet, setCodeSnippet] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
   const [fileInputKey, setFileInputKey] = useState(0); // Key to reset the file input element
+  // State to store the random fact
+  const [randomFact, setRandomFact] = useState(null);
   // State to store generated summary
   const [summary, setSummary] = useState([]);
   // States to store ratings for each perspective
@@ -95,6 +97,25 @@ const GenerateSummary = ({userId}) => {
     const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
     setGenerationTime(timeTaken.toFixed(2)); // Round to 2 decimal places
   };
+
+  // Function to fetch a random fact from the server
+  const fetchRandomFact = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/generate-random-fact');
+      if (response.data.status === 200) {
+        console.log('Random fact:', response.data.fact);
+        setRandomFact(response.data.fact); // Set the random fact in state
+      } else {
+        throw new Error('Failed to fetch random fact');
+      }
+    } catch (error) {
+      console.error('Error fetching random fact:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRandomFact();
+  }, []);
 
   // Function to handle "Submit Rating" button click
   const submitRating = async () => {
@@ -294,11 +315,21 @@ const GenerateSummary = ({userId}) => {
             </div>
           </>
         ) : (
-          <div className="no-summary-placeholder">
-            {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
-            <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
-            <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
-          </div>
+          <>
+            {randomFact ? (
+              <div className="no-summary-placeholder">
+                <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+                <p className="random-fact-message">By the time you generate a summary, enjoy this interesting fact - </p>
+                <p className="random-fact">Did you know... {randomFact}</p>
+              </div>
+            ) : (
+              <div className="no-summary-placeholder">
+                {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
+                <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+                <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
+              </div>
+            )}
+            </>
         )}
       </>
     )}
