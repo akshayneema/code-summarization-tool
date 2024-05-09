@@ -47,11 +47,16 @@ function App() {
     }
   };
 
-  const handleLoginSuccess = (userId, userRole) => {
+  const handleLoginSuccess = (userId, userRole, firstLogin) => {
     setIsLoggedIn(true);
     setShowHome(true);
     setUserId(userId); // Set user ID upon successful login
     setUserRole(userRole); // Set user role upon successful login
+    if (firstLogin == 'True') {
+      setTimeout(() => {
+        alert('Please change your password');
+      }, 2000);
+    }
   };
 
   const handleRegisterSuccess = () => {

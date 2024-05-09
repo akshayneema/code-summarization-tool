@@ -30,7 +30,7 @@ const Register = ({onSuccess, onLoginClick}) => {
       if (confirmPasswordError.length == 0) {
         const role = 'user';
         const response = await axios.post('http://127.0.0.1:5000/register', { username, email, password, role });
-        if (response.data.user_id) {
+        if (response.data && response.data.status == 'True') {
           onSuccess(); // Call the onSuccess function passed as a prop
         }
       }

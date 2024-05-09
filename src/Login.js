@@ -23,7 +23,7 @@ const Login = ({onSuccess, onRegisterClick, registerSuccess}) => {
       // Assuming the token is sent as a variable named 'access_token'
       const token = response.data.access_token
       setCookie('jwtToken', token, { path: '/' });
-      onSuccess(response.data.user_id, response.data.role); // Call the onSuccess function passed as a prop
+      onSuccess(response.data.user_id, response.data.role, response.data.first_login); // Call the onSuccess function passed as a prop
     } catch (error) {
       console.error('Error logging in:', error);
       setInvalidCreds(true);
