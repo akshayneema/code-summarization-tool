@@ -11,6 +11,7 @@ const [ ratingData, setRatingData ] = useState([]);
 const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
 const [adminName, setAdminName] = useState('');
 const [adminEmail, setAdminEmail] = useState('');
+const [emailError, setEmailError] = useState('');
 
 useEffect(() => {
   setRatingData([]);
@@ -21,11 +22,28 @@ useEffect(() => {
   }
 }, [cookies.jwtToken]);
 
+const handleEmailChange = (e) => {
+    const inputEmail = e.target.value;
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Check if inputEmail matches the emailRegex
+    setAdminEmail(inputEmail);
+    if (emailRegex.test(inputEmail)) {
+      // If valid, update the email state
+      setEmailError('');
+    } else {
+      // If not valid, you may show an error message or handle it as per your requirement
+      setEmailError('Please enter a valid email');
+    }
+  };
+
 // Function to handle updating admin data
-const handleUpdate = () => {
-    // Logic to update admin data (you can replace this with your own logic)
-    // For example, you might send a request to update the data on the server
-    console.log("Updating admin data...");
+const handleUpdate = async () => {
+    if (emailError) {
+        console.log("Please enter a valid email before proceeding")
+    } else {
+        const response = await axios.post('http://127.0.0.1:5000/update-profile', { adminName, adminEmail });
+    }
   };
 
 const getUserRatingsData = async () => {
@@ -86,7 +104,7 @@ return (
             placeholder="Enter email"
             className="input-email"
             value={adminEmail}
-            onChange={(e) => setAdminEmail(e.target.value)}
+            onChange={handleEmailChange}
             />
         </div>
       {/* Button to update admin data */}

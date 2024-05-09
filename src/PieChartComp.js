@@ -43,7 +43,7 @@ const PieChartComp = ({ data }) => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             {totalrating > 0 ? (
-                <PieChart width={600} height={400}>
+                <PieChart width={500} height={400}>
                     <Pie
                         data={data}
                         dataKey="rating"
@@ -60,7 +60,7 @@ const PieChartComp = ({ data }) => {
                     <Legend />
                 </PieChart>
             ) : (
-                <div style={{ width: 600, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ width: 500, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <span>No data available</span>
                 </div>
             )}
