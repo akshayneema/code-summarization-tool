@@ -24,6 +24,11 @@
 .update-button {
     width: 20%;
 }
+
+.error-message {
+    color: orangered;
+    font-size: medium;
+  }
   
   .admin-data-item h3 {
     margin-right: 10px;

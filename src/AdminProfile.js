@@ -12,6 +12,7 @@ const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken
 const [adminName, setAdminName] = useState('');
 const [adminEmail, setAdminEmail] = useState('');
 const [emailError, setEmailError] = useState('');
+const [ successMessage, setSuccessMessage] = useState(false);
 
 useEffect(() => {
   setRatingData([]);
@@ -42,7 +43,21 @@ const handleUpdate = async () => {
     if (emailError) {
         console.log("Please enter a valid email before proceeding")
     } else {
-        const response = await axios.post('http://127.0.0.1:5000/update-profile', { adminName, adminEmail });
+        const response = await axios.post(
+            'http://127.0.0.1:5000/update-profile',
+            { 'username': adminName, 'email': adminEmail }, // Request body
+            {
+                headers: {
+                    Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
+                }
+            }
+        );
+        if (response.data && response.data.status == 'True') {
+            setSuccessMessage(true);
+            setTimeout(() => {
+                setSuccessMessage(false);
+            }, 2000);
+        }
     }
   };
 
@@ -107,8 +122,10 @@ return (
             onChange={handleEmailChange}
             />
         </div>
+      {emailError && <p className="error-message">{emailError}</p>}
       {/* Button to update admin data */}
       <button onClick={handleUpdate} className='update-button'>Update</button>
+      {successMessage && <p>Admin profile updated successfully</p> }
     </div>
       )}
     
