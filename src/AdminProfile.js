@@ -63,7 +63,7 @@ const handleUpdate = async () => {
 
 const getUserRatingsData = async () => {
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/average-ratings`, {
+    const response = await axios.post(`http://127.0.0.1:5000/feedback-averages`, {'user_id_list': []}, {
       headers: {
         Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
       },

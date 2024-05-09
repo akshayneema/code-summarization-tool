@@ -1,53 +1,72 @@
 /* UserProfile.css */
 
 .user-profile-container {
-    color: black;
-    display: flex;
-    justify-content: space-between;
+  color: black;
+  display: flex;
+  justify-content: space-between;
 }
 
-  
-  .user-data-container {
-    flex: 1;
-    margin-left: 30px;
-  }
-  
-  .charts-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .pie-chart-container,
-  .bar-graph-container {
-    flex: 1;
-  }
-  
-  .pie-chart,
-  .bar-graph {
-    margin: 10px;
-  }
-  
+.user-data-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 50%;
+}
 
-  .login-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-image: url('image.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+.user-data-container {
+  flex: 1;
+  margin-left: 30px;
+}
+
+.input-name {
+  color: black;
+}
+
+.input-email {
+  color: black;
+}
+
+.update-button {
+  width: 20%;
+}
+
+.error-message {
+  color: orangered;
+  font-size: medium;
+}
+
+.charts-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pie-chart-container,
+.bar-graph-container {
+  flex: 1;
+}
+
+.pie-chart,
+.bar-graph {
+  margin: 10px;
 }
 
 .no-data-message {
-    height: 50%;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .no-data-message p {
-    text-align: center;
-  }
+  height: 50%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-data-message p {
+  text-align: center;
+}
+
+.user-data-item h3 {
+  margin-right: 10px;
+}
+
+.user-data-item input {
+  margin-bottom: 0;
+  flex: 1;
+}
