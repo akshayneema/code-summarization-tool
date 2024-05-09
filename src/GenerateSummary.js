@@ -427,7 +427,6 @@ const GenerateSummary = ({userId}) => {
         </div>
       </div>
     </div>
-    </div>
   );
 };
 
