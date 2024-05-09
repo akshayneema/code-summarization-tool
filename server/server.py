@@ -183,6 +183,18 @@ def update_profile():
 
     return jsonify({'message': 'Profile updated successfully', 'status': 'True'}), 200
 
+# Route to get the list of users
+@app.route('/get-users', methods=['GET'])
+def get_users():
+    try:
+        # Query users with role 'user' from the User table
+        users = User.query.filter_by(role='user').all()
+        # Transform the list of users into a list of dictionaries
+        user_data = [{"id": user.id, "username": user.username} for user in users]
+        return jsonify({"users": user_data}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch users", "details": str(e)}), 500
+
 @app.route('/generate-random-fact', methods=['POST', 'OPTIONS'])
 def generate_random_fact():
     if request.method == 'POST':

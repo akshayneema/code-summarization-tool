@@ -353,27 +353,28 @@ const GenerateSummary = ({userId}) => {
     )}
         </div>
 
-      <div>
+        <div>
           {/* Feedback submission message */}
           {feedbackMessage && <p style={{ fontWeight: 'bold' }}>{feedbackMessage}</p>}
       </div>
 
-      {/* Rating section */}
-      <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
-        <h2 className="rating-title">Rate the Summary:</h2>
-        <div className="rating-perspective">
-          <label className="rating-label">Naturalness:</label>
-          <div className="rating-options">
-            <input type="radio" id="naturalness-excellent" name="naturalness" value="5" checked={naturalnessRating === 5} onChange={() => setNaturalnessRating(5)} />
-            <label htmlFor="naturalness-excellent">Excellent</label>
-            <input type="radio" id="naturalness-good" name="naturalness" value="4" checked={naturalnessRating === 4} onChange={() => setNaturalnessRating(4)} />
-            <label htmlFor="naturalness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
-            <input type="radio" id="naturalness-average" name="naturalness" value="3" checked={naturalnessRating === 3} onChange={() => setNaturalnessRating(3)} />
-            <label htmlFor="naturalness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
-            <input type="radio" id="naturalness-bad" name="naturalness" value="2" checked={naturalnessRating === 2} onChange={() => setNaturalnessRating(2)} />
-            <label htmlFor="naturalness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
-            <input type="radio" id="naturalness-poor" name="naturalness" value="1" checked={naturalnessRating === 1} onChange={() => setNaturalnessRating(1)} />
-            <label htmlFor="naturalness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+        {/* Rating section */}
+        <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
+          <h2 className="rating-title">Rate the Summary:</h2>
+          <div className="rating-perspective">
+            <label className="rating-label">Naturalness:</label>
+            <div className="rating-options">
+              <input type="radio" id="naturalness-excellent" name="naturalness" value="5" checked={naturalnessRating === 5} onChange={() => setNaturalnessRating(5)} />
+              <label htmlFor="naturalness-excellent">Excellent</label>
+              <input type="radio" id="naturalness-good" name="naturalness" value="4" checked={naturalnessRating === 4} onChange={() => setNaturalnessRating(4)} />
+              <label htmlFor="naturalness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
+              <input type="radio" id="naturalness-average" name="naturalness" value="3" checked={naturalnessRating === 3} onChange={() => setNaturalnessRating(3)} />
+              <label htmlFor="naturalness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
+              <input type="radio" id="naturalness-bad" name="naturalness" value="2" checked={naturalnessRating === 2} onChange={() => setNaturalnessRating(2)} />
+              <label htmlFor="naturalness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
+              <input type="radio" id="naturalness-poor" name="naturalness" value="1" checked={naturalnessRating === 1} onChange={() => setNaturalnessRating(1)} />
+              <label htmlFor="naturalness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+            </div>
           </div>
           {/* Repeat the same process for the other perspectives */}
           {/* Usefulness */}
@@ -427,7 +428,6 @@ const GenerateSummary = ({userId}) => {
       </div>
     </div>
   );
-  
 };
 
 export default GenerateSummary;
