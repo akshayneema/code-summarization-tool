@@ -159,6 +159,56 @@ def check_login():
             ).filter(User.id == current_user).first()
     return jsonify({'message': 'Logged in as user id: ' + str(current_user), 'status': 'True', 'user_id': current_user, 'username': user_data[0], 'role': user_data[1], 'email': user_data[2]}), 200
 
+@app.route('/update-profile', methods=['POST'])
+@jwt_required()
+def update_profile():
+    data = request.json
+    username = data.get('username')
+    email = data.get('email')
+    user_id = get_jwt_identity()
+
+    # Retrieve the user from the database based on user_id
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'message': 'User not found', 'status': 'False'}), 404
+
+    # Update the user's username and email if provided
+    if username:
+        user.username = username
+    if email:
+        user.email = email
+
+    # Commit the changes to the database
+    db.session.commit()
+
+    return jsonify({'message': 'Profile updated successfully', 'status': 'True'}), 200
+
+@app.route('/generate-random-fact', methods=['POST', 'OPTIONS'])
+def generate_random_fact():
+    if request.method == 'POST':
+        try:
+            completion = client.chat.completions.create(
+                model='gpt-3.5-turbo',
+                messages=[
+                    {"role": "system", "content": "You are an interesting fact generator."},
+                    {"role": "user", "content": f"Did you know..."}
+                ]
+            )
+
+            return jsonify({"fact": completion.choices[0].message.content, "status": 200})
+        except Exception as e:
+            # Handle the error
+            error_message = f"An error occurred while generating fact: {str(e)}"
+            print(error_message)
+            return jsonify({"error": error_message, "status": 500})
+    
+    elif request.method == 'OPTIONS':
+        # Respond to OPTIONS requests with CORS headers
+        response = jsonify({'message': 'CORS preflight handled'})
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+
 @app.route('/generate-summary', methods=['POST', 'OPTIONS'])
 def generate_summary():
     if request.method == 'POST':
