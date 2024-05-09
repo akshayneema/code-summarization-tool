@@ -34,7 +34,7 @@ const Login = ({onSuccess, onRegisterClick, registerSuccess}) => {
     <div className="login-container">
       <div className="form-container">
         <h2 className="login-heading">Login</h2>
-        { registerSuccess && <p className="success-message">Registered Successfully. You can login now</p>}
+        { registerSuccess && <p className="register-success-message">Registered Successfully. You can login now</p>}
         <div className="input-container">
           <FontAwesomeIcon icon={faUser} className="icon" />
           <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />

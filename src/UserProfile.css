@@ -13,6 +13,7 @@
 .data-feedback-container {
   flex: 1; /* Make the container take up remaining space */
   margin-right: 20px; /* Add margin to separate from charts */
+  margin-left: 30px;
 }
 
 .charts-container {
@@ -28,6 +29,7 @@
 }
 
 .feedback-container {
+  width: 50%;
   margin-bottom: 20px; /* Add margin between user data and feedbacks */
 }
 
@@ -104,4 +106,9 @@
 .user-data-item input {
   margin-bottom: 0;
   flex: 1;
+}
+
+.no-data-message {
+  font-weight: bold;
+  font-size: large;
 }

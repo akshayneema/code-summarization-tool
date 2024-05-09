@@ -65,3 +65,8 @@
 .bar-graph {
   margin: 10px;
 }
+
+.no-data-message {
+  font-weight: bold;
+  font-size: large;
+}

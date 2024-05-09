@@ -175,7 +175,7 @@ const getUserRatingsData = async () => {
         },
       }
     );
-    if (response.data && response.data.avg_naturalness) {
+    if (response.data) {
       const naturalness = {
           'name': 'Average Naturalness',
           'rating': response.data.avg_naturalness
@@ -340,11 +340,7 @@ return (
       <div className="pie-chart-container">
         <h2>Pie Chart:</h2>
         <div>
-          {ratingData ? (
-              <PieChartComp data={ratingData} />
-          ) : (
-              <p>No data available</p>
-          )}
+            <PieChartComp data={ratingData} />
         </div>
       </div>
       
@@ -352,11 +348,7 @@ return (
       <div className="bar-graph-container">
         <h2>Bar Graph:</h2>
         <div>
-          {ratingData ? (
-              <BarGraphComp data={ratingData} />
-          ) : (
-              <p>No data available</p>
-          )}
+            <BarGraphComp data={ratingData} />
         </div>
       </div>
     </div>
