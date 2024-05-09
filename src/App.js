@@ -111,7 +111,7 @@ function App() {
           <GenerateSummary userId={userId} />
         </div>
       )}
-      {isLoggedIn && showProfile && userRole=='user' && <UserProfile user_id={userId} />}
+      {isLoggedIn && showProfile && userRole=='user' && <UserProfile user_id={userId} user_name={userName} user_email={userEmail} />}
       {isLoggedIn && showProfile && userRole=='admin' && <AdminProfile admin_name={userName} admin_email={userEmail} />}
     </div>
   );

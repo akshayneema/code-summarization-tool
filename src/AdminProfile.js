@@ -4,6 +4,7 @@ import BarGraphComp from './BarGraphComp'; // Import component to display bar gr
 import './AdminProfile.css'; // Import CSS file for styling
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
+import Select from 'react-select'; // Import React Select
 
 const AdminProfile = ({ admin_name, admin_email }) => {
 // Destructure the props to extract adminData, pieChartData, and barGraphData
@@ -12,13 +13,17 @@ const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken
 const [adminName, setAdminName] = useState('');
 const [adminEmail, setAdminEmail] = useState('');
 const [emailError, setEmailError] = useState('');
+const [selectedUsers, setSelectedUsers] = useState([]); 
+const [userOptions, setUserOptions] = useState([]);
+const [ successMessage, setSuccessMessage] = useState(false);
 
 useEffect(() => {
   setRatingData([]);
   setAdminName(admin_name);
   setAdminEmail(admin_email);
   if (cookies.jwtToken) {
-    getUserRatingsData()
+    getUserRatingsData();
+    fetchUsers();
   }
 }, [cookies.jwtToken]);
 
@@ -42,17 +47,38 @@ const handleUpdate = async () => {
     if (emailError) {
         console.log("Please enter a valid email before proceeding")
     } else {
-        const response = await axios.post('http://127.0.0.1:5000/update-profile', { adminName, adminEmail });
+        const response = await axios.post(
+            'http://127.0.0.1:5000/update-profile',
+            { 'username': adminName, 'email': adminEmail }, // Request body
+            {
+                headers: {
+                    Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
+                }
+            }
+        );
+        if (response.data && response.data.status == 'True') {
+            setSuccessMessage(true);
+            setTimeout(() => {
+                setSuccessMessage(false);
+            }, 2000);
+        }
     }
   };
 
 const getUserRatingsData = async () => {
   try {
-    const response = await axios.get(`http://127.0.0.1:5000/average-ratings`, {
-      headers: {
-        Authorization: `Bearer ${cookies.jwtToken}`, // Send token as a header
+    const userIds = selectedUsers.map(user => user.value); // Extract user ids from selectedUsers
+    const response = await axios.post(
+      `http://127.0.0.1:5000/feedback-averages`,
+      {
+        user_id_list: userIds, // Pass user ids in the request body
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.jwtToken}`,
+        },
+      }
+    );
     if (response.data && response.data.avg_naturalness) {
       const naturalness = {
           'name': 'Average Naturalness',
@@ -78,6 +104,28 @@ const getUserRatingsData = async () => {
     console.log("Error while getting user ratings data")
   }
 };
+
+// Function to fetch users from the backend
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get('http://127.0.0.1:5000/get-users'); // Replace with your API endpoint
+    const users = response.data.users.map((user) => ({
+      value: user.id,
+      label: user.username,
+    }));
+    setUserOptions(users);
+  } catch (error) {
+    console.log('Error fetching users:', error);
+  }
+};
+
+const handleSelectChange = (selectedOptions) => {
+  setSelectedUsers(selectedOptions);
+};
+
+useEffect(() => {
+  getUserRatingsData();
+}, [selectedUsers]);
 
 return (
   <div className="admin-profile-container">
@@ -107,13 +155,34 @@ return (
             onChange={handleEmailChange}
             />
         </div>
+      {emailError && <p className="error-message">{emailError}</p>}
       {/* Button to update admin data */}
       <button onClick={handleUpdate} className='update-button'>Update</button>
+      {successMessage && <p>Admin profile updated successfully</p> }
     </div>
       )}
     
+    
     {/* Display pie chart */}
     <div className="charts-container">
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span>Select Users:&nbsp;&nbsp;</span>
+      <Select
+        options={userOptions}
+        isMulti
+        onChange={handleSelectChange}
+        placeholder={selectedUsers.length > 0 ? 'Selected Users' : 'Showing All Users'}
+        value={selectedUsers}
+        styles={{
+          menu: (provided, state) => ({
+            ...provided,
+            marginTop: 0, // Adjust the marginTop to 0
+          }),
+        }}
+      />
+
+    </div>
+
       <div className="pie-chart-container">
         <h2>Pie Chart:</h2>
         <div>
