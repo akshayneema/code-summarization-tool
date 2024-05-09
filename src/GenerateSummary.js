@@ -4,16 +4,23 @@ import { Editor } from '@monaco-editor/react';
 import { Select, MenuItem } from '@material-ui/core';
 import './GenerateSummary.css'; // Import CSS file for component styling
 import { useCookies } from 'react-cookie';
+import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 
 const GenerateSummary = ({userId}) => {
   // State to store code snippet input
   const [codeSnippet, setCodeSnippet] = useState('');
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [fileInputKey, setFileInputKey] = useState(0); // Key to reset the file input element
   // State to store generated summary
-  const [summary, setSummary] = useState('');
+  const [summary, setSummary] = useState([]);
   // States to store ratings for each perspective
   const [naturalnessRating, setNaturalnessRating] = useState(3); // Default: Average
   const [usefulnessRating, setUsefulnessRating] = useState(3); // Default: Average
   const [consistencyRating, setConsistencyRating] = useState(3); // Default: Average
+  const [textualFeedback, setTextualFeedback] = useState('');
+  const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false);
+
+
   // State to track whether a summary is generated
   const [isRatingSectionOpen, setIsRatingSectionOpen] = useState(false);
 
@@ -24,6 +31,9 @@ const GenerateSummary = ({userId}) => {
 
   const [selectedLanguage, setSelectedLanguage] = useState('Python'); // Default language is Python
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo'); // Default language is Python
+  const [numSummaries, setNumSummaries] = useState(1); // Default: 1
+  const [selectedSummaryIndex, setSelectedSummaryIndex] = useState(0);
+
   const [theme, setTheme] = useState('light'); // Default theme is light
   const [cookies, setCookie] = useCookies(['jwtToken']);
 
@@ -37,6 +47,12 @@ const GenerateSummary = ({userId}) => {
     }
   }, [isSummaryGenerating]);
 
+  useEffect(() => {
+      // Reset isFeedbackSubmitted when a new summary is generated or a different summary is selected
+      setIsFeedbackSubmitted(false);
+  }, [selectedSummaryIndex, summary]);
+
+
   // Function to handle code snippet input change
   const handleCodeChange = (value) => {
     setCodeSnippet(value);
@@ -46,11 +62,13 @@ const GenerateSummary = ({userId}) => {
   const generateSummary = async () => {
     const startTime = Date.now();
     setIsSummaryGenerating(true); // Set loading state to true
+    setIsRatingSectionOpen(false);
       try {
         const response = await axios.post('http://127.0.0.1:5000/generate-summary', {
           codeLanguage: selectedLanguage,
           codeSnippet: codeSnippet,
-          summarizationModel: selectedModel
+          summarizationModel: selectedModel,
+          numSummaries: numSummaries
         });
     
         if (response.data.status == 200) {
@@ -60,6 +78,7 @@ const GenerateSummary = ({userId}) => {
           setUsefulnessRating(3); // Average
           setConsistencyRating(3); // Average
           setIsRatingSectionOpen(true);
+          setSelectedSummaryIndex(0); // Reset selected summary index to 0
         } else {
           throw new Error('Failed to generate summary. Status: ' + response.status + ', Error: ' + response.error);
         }
@@ -82,24 +101,33 @@ const GenerateSummary = ({userId}) => {
     console.log('Naturalness Rating:', naturalnessRating);
     console.log('Usefulness Rating:', usefulnessRating);
     console.log('Consistency Rating:', consistencyRating);
+    console.log('Textual Feedback:', textualFeedback);
 
     try {
-
+      const selectedSummary = summary[selectedSummaryIndex]; // Extract the selected summary
       const response = await axios.post('http://127.0.0.1:5000/submit-feedback', {
         user_id: userId,
         language: selectedLanguage,
         model: selectedModel,
         code: codeSnippet,
-        summary: summary,
+        summary: selectedSummary, // Pass only the selected summary
         naturalness_rating: naturalnessRating,
         usefulness_rating: usefulnessRating,
-        consistency_rating: consistencyRating
+        consistency_rating: consistencyRating,
+        textual_feedback: textualFeedback // Include textual feedback
       });
+
+      setIsFeedbackSubmitted(true);
+      // Reset ratings to default values
+      setNaturalnessRating(3);
+      setUsefulnessRating(3);
+      setConsistencyRating(3);
+      setTextualFeedback('');
     } catch (error) {
       console.error('Error submitting feedback:', error);
     }
 
-    setIsRatingSectionOpen(false);
+    // setIsRatingSectionOpen(false);
   };
 
   const handleLanguageChange = (event) => {
@@ -110,131 +138,239 @@ const GenerateSummary = ({userId}) => {
     setSelectedModel(event.target.value);
   };
 
+  // Function to handle file upload
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFileName(file.name); // Set the name of the selected file
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const content = event.target.result;
+        setCodeSnippet(content); // Populate code editor with file content
+      };
+      reader.readAsText(file);
+      setFileInputKey((prevKey) => prevKey + 1);
+    }
+  };
+
+  // Function to handle number of summaries change
+  const handleNumSummariesChange = (event) => {
+    setNumSummaries(event.target.value);
+  };
+
+  // Function to handle selection of a different summary
+  const handleSelectedSummaryChange = (event) => {
+    setSelectedSummaryIndex(event.target.value);
+    setNaturalnessRating(3);
+    setUsefulnessRating(3);
+    setConsistencyRating(3);
+    setTextualFeedback('');
+  };
+
+  // Function to handle textual feedback input change
+  const handleTextualFeedbackChange = (event) => {
+    setTextualFeedback(event.target.value);
+  };
+
   const toggleTheme = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   return (
     <div className={`container ${theme === 'light' ? 'light-theme' : 'dark-theme'}`}>
-      <h1 className="title">Code Summarization Tool</h1>
-      <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
-        {theme === 'light' ? '🌞' : '🌙'}
+      <div className="left-panel">
+        <h1 className="title">Input Code</h1>
+        {/* <div className={`theme-toggle ${theme === 'light' ? 'theme-toggle-light' : 'theme-toggle-dark'}`} onClick={toggleTheme}>
+          {theme === 'light' ? '🌞' : '🌙'}
+        </div> */}
+        {/* Input area for code snippet */}
+        <div className="language-dropdown">
+          <label>Select Language: </label>
+          <Select
+            value={selectedLanguage}
+            onChange={handleLanguageChange}
+            renderValue={(value) => (
+              <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedLanguage}</span>
+            )}
+          >
+            <MenuItem value="Python">Python</MenuItem>
+            <MenuItem value="JavaScript">JavaScript</MenuItem>
+            <MenuItem value="Java">Java</MenuItem>
+          </Select>
+        </div>
+        <div className="model-dropdown">
+          <label>Select Model: </label>
+          <Select
+            value={selectedModel}
+            onChange={handleModelChange}
+            renderValue={(value) => (
+              <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedModel}</span>
+            )}
+          >
+            <MenuItem value="gpt-3.5-turbo">gpt-3.5-turbo</MenuItem>
+            <MenuItem value="gpt-4">gpt-4</MenuItem>
+            <MenuItem value="gpt-4-turbo">gpt-4-turbo</MenuItem>
+          </Select>
+        </div>
+        <div className="num-summaries-dropdown">
+          <label>Select Number of Summaries: </label>
+          <Select
+            value={numSummaries}
+            onChange={handleNumSummariesChange}
+            renderValue={(value) => (
+              <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{value}</span>
+            )}
+          >
+            {[...Array(10)].map((_, index) => (
+              <MenuItem key={index + 1} value={index + 1}>{index + 1}</MenuItem>
+            ))}
+          </Select>
+        </div>
+        <Editor
+          language={selectedLanguage.toLowerCase()}
+          value={codeSnippet}
+          onChange={handleCodeChange}
+          options={{
+            minimap: {
+              enabled: false
+            }
+          }}
+          height="600px"
+          disabled={isSummaryGenerating}
+        />
+        <div className="file-upload-container">
+          <label className="file-upload-label">
+            {/* <CloudUploadIcon className="file-upload-icon" />  */}
+            <span className="file-upload-button">Choose File</span>
+            <input
+              key={fileInputKey}
+              type="file"
+              accept=".txt,.js,.py"
+              onChange={(event) => { // Clear the file input field after selection
+                handleFileUpload(event); // Call handleFileUpload manually
+              }}
+              className="file-upload-input"
+              style={{ display: 'none' }} // Hide the default file input
+            />
+          </label>
+          <span className="file-upload-info">
+            {selectedFileName ? 'File Selected: ' + selectedFileName : 'No file selected'}
+          </span>
+        </div>
+        <br />
+        {/* "Generate Summary" button */}
+        <button className={`generate-btn ${isSummaryGenerating ? 'disabled' : ''}`} onClick={generateSummary} disabled={isSummaryGenerating}>Generate Summary</button>
       </div>
-      {/* Input area for code snippet */}
-      <div className="language-dropdown">
-        <label>Select Language: </label>
-        <Select
-          value={selectedLanguage}
-          onChange={handleLanguageChange}
-          renderValue={(value) => (
-            <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedLanguage}</span>
-          )}
-        >
-          <MenuItem value="Python">Python</MenuItem>
-          <MenuItem value="JavaScript">JavaScript</MenuItem>
-          <MenuItem value="Java">Java</MenuItem>
-        </Select>
-      </div>
-      <div className="model-dropdown">
-        <label>Select Model: </label>
-        <Select
-          value={selectedModel}
-          onChange={handleModelChange}
-          renderValue={(value) => (
-            <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>{selectedModel}</span>
-          )}
-        >
-          <MenuItem value="gpt-3.5-turbo">gpt-3.5-turbo</MenuItem>
-          <MenuItem value="gpt-4">gpt-4</MenuItem>
-          <MenuItem value="gpt-4-turbo">gpt-4-turbo</MenuItem>
-        </Select>
-      </div>
-      <Editor
-        language={selectedLanguage.toLowerCase()}
-        value={codeSnippet}
-        onChange={handleCodeChange}
-        options={{
-          minimap: {
-            enabled: false
-          }
-        }}
-        height="400px"
-        disabled={isSummaryGenerating}
-      />
-      <br />
-      {/* "Generate Summary" button */}
-      <button className={`generate-btn ${isSummaryGenerating ? 'disabled' : ''}`} onClick={generateSummary} disabled={isSummaryGenerating}>Generate Summary</button>
-      <hr />
+      {/* <hr /> */}
       {/* Display area for generated summary */}
-      <div className={`summary-container ${isBlip ? 'blip' : ''}`}>
-        <h2 className="summary-title">Generated Summary:</h2>
+      <div className="right-panel">
+        <h1 className="title">Generated Summary</h1>
+        <div className={`summary-container ${isBlip ? 'blip' : ''}`}>
         {isSummaryGenerating ? (
-          <p className="loading-message">Hold on a sec while I get your summary...</p>
-        ) : (
+      <p className="loading-message">Hold on a sec while I get your summary...</p>
+    ) : (
+      <>
+        {summary.length > 0 ? (
           <>
-            <p className="summary">{summary}</p>
+            <div className="summary-dropdown">
+              <label>Select Summary: </label>
+              <Select
+                value={selectedSummaryIndex}
+                onChange={handleSelectedSummaryChange}
+                renderValue={(value) => (
+                  <span style={{ color: theme === 'dark' ? '#f8f8f8' : '#333' }}>Summary {value+1}</span>
+                )}
+              >
+                {summary.map((_, index) => (
+                  <MenuItem key={index} value={index}>{`Summary ${index + 1}`}</MenuItem>
+                ))}
+              </Select>
+            </div>
+            <p className="summary">{summary[selectedSummaryIndex]}</p>
             <div className="generation-time">
               {generationTime !== null && (
                 <p>Summary generated in {generationTime} seconds.</p>
               )}
             </div>
           </>
+        ) : (
+          <div className="no-summary-placeholder">
+            {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
+            <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+            <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
+          </div>
         )}
-      </div>
+      </>
+    )}
+        </div>
 
-      {/* Rating section */}
-      <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
-        <h2 className="rating-title">Rate the Summary:</h2>
-        <div className="rating-perspective">
-          <label className="rating-label">Naturalness:</label>
-          <div className="rating-options">
-            <input type="radio" id="naturalness-excellent" name="naturalness" value="5" checked={naturalnessRating === 5} onChange={() => setNaturalnessRating(5)} />
-            <label htmlFor="naturalness-excellent">Excellent</label>
-            <input type="radio" id="naturalness-good" name="naturalness" value="4" checked={naturalnessRating === 4} onChange={() => setNaturalnessRating(4)} />
-            <label htmlFor="naturalness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
-            <input type="radio" id="naturalness-average" name="naturalness" value="3" checked={naturalnessRating === 3} onChange={() => setNaturalnessRating(3)} />
-            <label htmlFor="naturalness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
-            <input type="radio" id="naturalness-bad" name="naturalness" value="2" checked={naturalnessRating === 2} onChange={() => setNaturalnessRating(2)} />
-            <label htmlFor="naturalness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
-            <input type="radio" id="naturalness-poor" name="naturalness" value="1" checked={naturalnessRating === 1} onChange={() => setNaturalnessRating(1)} />
-            <label htmlFor="naturalness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+        {/* Rating section */}
+        <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
+          <h2 className="rating-title">Rate the Summary:</h2>
+          <div className="rating-perspective">
+            <label className="rating-label">Naturalness:</label>
+            <div className="rating-options">
+              <input type="radio" id="naturalness-excellent" name="naturalness" value="5" checked={naturalnessRating === 5} onChange={() => setNaturalnessRating(5)} />
+              <label htmlFor="naturalness-excellent">Excellent</label>
+              <input type="radio" id="naturalness-good" name="naturalness" value="4" checked={naturalnessRating === 4} onChange={() => setNaturalnessRating(4)} />
+              <label htmlFor="naturalness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
+              <input type="radio" id="naturalness-average" name="naturalness" value="3" checked={naturalnessRating === 3} onChange={() => setNaturalnessRating(3)} />
+              <label htmlFor="naturalness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
+              <input type="radio" id="naturalness-bad" name="naturalness" value="2" checked={naturalnessRating === 2} onChange={() => setNaturalnessRating(2)} />
+              <label htmlFor="naturalness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
+              <input type="radio" id="naturalness-poor" name="naturalness" value="1" checked={naturalnessRating === 1} onChange={() => setNaturalnessRating(1)} />
+              <label htmlFor="naturalness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+            </div>
           </div>
-        </div>
-        {/* Repeat the same process for the other perspectives */}
-        {/* Usefulness */}
-        <div className="rating-perspective">
-          <label className="rating-label">Usefulness:</label>
-          <div className="rating-options">
-            <input type="radio" id="usefulness-excellent" name="usefulness" value="5" checked={usefulnessRating === 5} onChange={() => setUsefulnessRating(5)} />
-            <label htmlFor="usefulness-excellent" className={theme === 'dark' ? 'dark-mode-label' : ''}>Excellent</label>
-            <input type="radio" id="usefulness-good" name="usefulness" value="4" checked={usefulnessRating === 4} onChange={() => setUsefulnessRating(4)} />
-            <label htmlFor="usefulness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
-            <input type="radio" id="usefulness-average" name="usefulness" value="3" checked={usefulnessRating === 3} onChange={() => setUsefulnessRating(3)} />
-            <label htmlFor="usefulness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
-            <input type="radio" id="usefulness-bad" name="usefulness" value="2" checked={usefulnessRating === 2} onChange={() => setUsefulnessRating(2)} />
-            <label htmlFor="usefulness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
-            <input type="radio" id="usefulness-poor" name="usefulness" value="1" checked={usefulnessRating === 1} onChange={() => setUsefulnessRating(1)} />
-            <label htmlFor="usefulness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+          {/* Repeat the same process for the other perspectives */}
+          {/* Usefulness */}
+          <div className="rating-perspective">
+            <label className="rating-label">Usefulness:</label>
+            <div className="rating-options">
+              <input type="radio" id="usefulness-excellent" name="usefulness" value="5" checked={usefulnessRating === 5} onChange={() => setUsefulnessRating(5)} />
+              <label htmlFor="usefulness-excellent" className={theme === 'dark' ? 'dark-mode-label' : ''}>Excellent</label>
+              <input type="radio" id="usefulness-good" name="usefulness" value="4" checked={usefulnessRating === 4} onChange={() => setUsefulnessRating(4)} />
+              <label htmlFor="usefulness-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
+              <input type="radio" id="usefulness-average" name="usefulness" value="3" checked={usefulnessRating === 3} onChange={() => setUsefulnessRating(3)} />
+              <label htmlFor="usefulness-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
+              <input type="radio" id="usefulness-bad" name="usefulness" value="2" checked={usefulnessRating === 2} onChange={() => setUsefulnessRating(2)} />
+              <label htmlFor="usefulness-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
+              <input type="radio" id="usefulness-poor" name="usefulness" value="1" checked={usefulnessRating === 1} onChange={() => setUsefulnessRating(1)} />
+              <label htmlFor="usefulness-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+            </div>
           </div>
-        </div>
-        {/* Consistency */}
-        <div className="rating-perspective">
-          <label className="rating-label">Consistency:</label>
-          <div className="rating-options">
-            <input type="radio" id="consistency-excellent" name="consistency" value="5" checked={consistencyRating === 5} onChange={() => setConsistencyRating(5)} />
-            <label htmlFor="consistency-excellent" className={theme === 'dark' ? 'dark-mode-label' : ''}>Excellent</label>
-            <input type="radio" id="consistency-good" name="consistency" value="4" checked={consistencyRating === 4} onChange={() => setConsistencyRating(4)} />
-            <label htmlFor="consistency-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
-            <input type="radio" id="consistency-average" name="consistency" value="3" checked={consistencyRating === 3} onChange={() => setConsistencyRating(3)} />
-            <label htmlFor="consistency-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
-            <input type="radio" id="consistency-bad" name="consistency" value="2" checked={consistencyRating === 2} onChange={() => setConsistencyRating(2)} />
-            <label htmlFor="consistency-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
-            <input type="radio" id="consistency-poor" name="consistency" value="1" checked={consistencyRating === 1} onChange={() => setConsistencyRating(1)} />
-            <label htmlFor="consistency-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+          {/* Consistency */}
+          <div className="rating-perspective">
+            <label className="rating-label">Consistency:</label>
+            <div className="rating-options">
+              <input type="radio" id="consistency-excellent" name="consistency" value="5" checked={consistencyRating === 5} onChange={() => setConsistencyRating(5)} />
+              <label htmlFor="consistency-excellent" className={theme === 'dark' ? 'dark-mode-label' : ''}>Excellent</label>
+              <input type="radio" id="consistency-good" name="consistency" value="4" checked={consistencyRating === 4} onChange={() => setConsistencyRating(4)} />
+              <label htmlFor="consistency-good" className={theme === 'dark' ? 'dark-mode-label' : ''}>Good</label>
+              <input type="radio" id="consistency-average" name="consistency" value="3" checked={consistencyRating === 3} onChange={() => setConsistencyRating(3)} />
+              <label htmlFor="consistency-average" className={theme === 'dark' ? 'dark-mode-label' : ''}>Average</label>
+              <input type="radio" id="consistency-bad" name="consistency" value="2" checked={consistencyRating === 2} onChange={() => setConsistencyRating(2)} />
+              <label htmlFor="consistency-bad" className={theme === 'dark' ? 'dark-mode-label' : ''}>Bad</label>
+              <input type="radio" id="consistency-poor" name="consistency" value="1" checked={consistencyRating === 1} onChange={() => setConsistencyRating(1)} />
+              <label htmlFor="consistency-poor" className={theme === 'dark' ? 'dark-mode-label' : ''}>Poor</label>
+            </div>
           </div>
+          <textarea
+            className={`textual-feedback-textarea ${theme === 'dark' ? 'dark-mode' : ''}`}
+            style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px' }}
+            placeholder="Additional feedback..."
+            value={textualFeedback}
+            onChange={handleTextualFeedbackChange}
+          />
+          {/* Submit rating button */}
+          <button 
+              className={`submit-rating-btn ${theme === 'dark' ? 'dark-mode-btn' : ''}`} 
+              onClick={submitRating}
+              disabled={isFeedbackSubmitted} // Disable button if feedback is already submitted
+          >
+              {isFeedbackSubmitted ? 'Submitted' : 'Submit Rating'}
+          </button>
         </div>
-        {/* Submit rating button */}
-        <button className={`submit-rating-btn ${theme === 'dark' ? 'dark-mode-btn' : ''}`} onClick={submitRating}>Submit Rating</button>
       </div>
     </div>
   );

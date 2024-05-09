@@ -94,13 +94,13 @@ function App() {
 
 
   return (
-    <div className={`app-container ${isLoggedIn ? 'loggedin-image' : 'login-image'}`}>
+    <div>
       {isLoggedIn && (
         <header>
           <nav>
-            <button className="header-button" onClick={handleHome}>Home</button>
-            <button className="header-button" onClick={handleProfile}>Profile</button>
-            <button className="header-button" onClick={handleLogout}>Logout</button>
+            <button onClick={handleHome}>Home</button>
+            <button onClick={handleProfile}>Profile</button>
+            <button onClick={handleLogout}>Logout</button>
           </nav>
         </header>
       )}
