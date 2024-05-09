@@ -26,6 +26,7 @@ const GenerateSummary = ({userId}) => {
   const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo'); // Default language is Python
   const [theme, setTheme] = useState('light'); // Default theme is light
   const [cookies, setCookie] = useCookies(['jwtToken']);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   // Effect to trigger blip animation when isSummaryGenerating is true
   useEffect(() => {
@@ -95,8 +96,26 @@ const GenerateSummary = ({userId}) => {
         usefulness_rating: usefulnessRating,
         consistency_rating: consistencyRating
       });
+
+      // Check if the request was successful
+      if (response.status === 200) {
+        // Set feedback submission success message
+        setFeedbackMessage('Feedback submitted successfully !');
+      } else {
+        // Set feedback submission error message if the request was not successful
+        setFeedbackMessage('Error submitting feedback');
+      }
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 3000);
+
     } catch (error) {
       console.error('Error submitting feedback:', error);
+      // Set feedback submission error message
+      setFeedbackMessage('Error submitting feedback');
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 2000);
     }
 
     setIsRatingSectionOpen(false);
@@ -182,6 +201,11 @@ const GenerateSummary = ({userId}) => {
         )}
       </div>
 
+      <div>
+          {/* Feedback submission message */}
+          {feedbackMessage && <p style={{ fontWeight: 'bold' }}>{feedbackMessage}</p>}
+      </div>
+
       {/* Rating section */}
       <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
         <h2 className="rating-title">Rate the Summary:</h2>
@@ -238,6 +262,7 @@ const GenerateSummary = ({userId}) => {
       </div>
     </div>
   );
+  
 };
 
 export default GenerateSummary;
