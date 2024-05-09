@@ -75,7 +75,11 @@ button {
   cursor: pointer;
 }
 
-.confirm-password-error {
+.register-button {
+  color: white;
+}
+
+.error-message {
   color: orangered;
   font-size: small;
 }

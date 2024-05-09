@@ -6,15 +6,19 @@ import axios from 'axios';
 import './App.css'; // Import CSS file for styling
 import { useCookies } from 'react-cookie';
 import UserProfile from './UserProfile';
+import AdminProfile from './AdminProfile';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(true);
   const [showHome, setShowHome] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
   const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
   const [userId, setUserId] = useState(null); // State to store user ID
   const [userRole, setUserRole] = useState(null); // State to store user role
+  const [userName, setUserName] = useState(null); // State to store user name
+  const [userEmail, setUserEmail] = useState(null); // State to store user email
 
   useEffect(() => {
     if (cookies.jwtToken) {
@@ -33,6 +37,8 @@ function App() {
         setIsLoggedIn(true);
         setUserId(response.data.user_id); // Set user ID from response
         setUserRole(response.data.role); // Set user role from response
+        setUserName(response.data.username); // Set username from response
+        setUserEmail(response.data.email); // Set user email from response
       } else {
         setIsLoggedIn(false);
       }
@@ -46,6 +52,14 @@ function App() {
     setShowHome(true);
     setUserId(userId); // Set user ID upon successful login
     setUserRole(userRole); // Set user role upon successful login
+  };
+
+  const handleRegisterSuccess = () => {
+    setShowLogin(true);
+    setRegisterSuccess(true);
+    setTimeout(() => {
+      setRegisterSuccess(false);
+    }, 3000);
   };
 
   // Function to handle logout
@@ -78,31 +92,6 @@ function App() {
     setShowProfile(true);
   }
 
-  // Sample data for testing
-  const sampleUserData = {
-    name: 'John Doe',
-    age: 30,
-    email: 'john.doe@example.com',
-    location: 'New York, USA',
-  };
-
-  const samplePieChartData = [
-    { label: 'Category A', value: 25 },
-    { label: 'Category B', value: 35 },
-    { label: 'Category C', value: 20 },
-    { label: 'Category D', value: 10 },
-    { label: 'Category E', value: 10 },
-  ];
-
-  const sampleBarGraphData = [
-    { label: 'January', value: 20 },
-    { label: 'February', value: 35 },
-    { label: 'March', value: 40 },
-    { label: 'April', value: 30 },
-    { label: 'May', value: 45 },
-    { label: 'June', value: 55 },
-  ];
-
 
   return (
     <div>
@@ -115,16 +104,15 @@ function App() {
           </nav>
         </header>
       )}
-      {!isLoggedIn && showLogin && <Login onSuccess={handleLoginSuccess} onRegisterClick={handleRegister} />}
-      {!isLoggedIn && !showLogin && <Register onSuccess={handleLoginSuccess} onLoginClick={handleLogin} />}
+      {!isLoggedIn && showLogin && <Login onSuccess={handleLoginSuccess} onRegisterClick={handleRegister} registerSuccess={registerSuccess} />}
+      {!isLoggedIn && !showLogin && <Register onSuccess={handleRegisterSuccess} onLoginClick={handleLogin} />}
       {isLoggedIn && showHome && (
         <div className="generate-summary">
           <GenerateSummary userId={userId} />
         </div>
       )}
-      {isLoggedIn && showProfile && <UserProfile userData={sampleUserData} pieChartData={samplePieChartData} 
-          barGraphData={sampleBarGraphData}
-        />}
+      {isLoggedIn && showProfile && userRole=='user' && <UserProfile user_id={userId} />}
+      {isLoggedIn && showProfile && userRole=='admin' && <AdminProfile admin_name={userName} admin_email={userEmail} />}
     </div>
   );
 }
