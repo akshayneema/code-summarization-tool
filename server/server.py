@@ -183,6 +183,18 @@ def update_profile():
 
     return jsonify({'message': 'Profile updated successfully', 'status': 'True'}), 200
 
+# Route to get the list of users
+@app.route('/get-users', methods=['GET'])
+def get_users():
+    try:
+        # Query users with role 'user' from the User table
+        users = User.query.filter_by(role='user').all()
+        # Transform the list of users into a list of dictionaries
+        user_data = [{"id": user.id, "username": user.username} for user in users]
+        return jsonify({"users": user_data}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch users", "details": str(e)}), 500
+
 @app.route('/generate-random-fact', methods=['POST', 'OPTIONS'])
 def generate_random_fact():
     if request.method == 'POST':
@@ -190,8 +202,7 @@ def generate_random_fact():
             completion = client.chat.completions.create(
                 model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please."},
-                    {"role": "user", "content": f"Did you know..."}
+                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please. Start the fact as - Did you know..."}
                 ]
             )
 
@@ -316,7 +327,23 @@ def submit_feedback():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
+@app.route('/user/<int:user_id>/get-feedbacks')
+def get_feedbacks(user_id):
+    feedbacks = Feedback.query.filter_by(user_id=user_id).all()
+    feedbacks_data = [{
+        'id': feedback.id,
+        'language': feedback.language,
+        'model': feedback.model,
+        'code': feedback.code,
+        'summary': feedback.summary,
+        'naturalness_rating': feedback.naturalness_rating,
+        'usefulness_rating': feedback.usefulness_rating,
+        'consistency_rating': feedback.consistency_rating,
+        'textual_feedback': feedback.textual_feedback,
+        'created_at': feedback.created_at
+    } for feedback in feedbacks]
 
+    return jsonify(feedbacks_data)
 
 @app.route('/feedback-averages', methods=['POST'])
 def feedback_averages():
