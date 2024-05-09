@@ -35,6 +35,31 @@
   display: flex;
   flex-direction: column;
   width: 300px; /* Set a fixed width for the charts container */
+  justify-content: space-between;
+}
+
+.user-data-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 50%;
+}
+
+.input-name {
+  color: black;
+}
+
+.input-email {
+  color: black;
+}
+
+.update-button {
+  width: 20%;
+}
+
+.error-message {
+  color: orangered;
+  font-size: medium;
 }
 
 .pie-chart-container,
@@ -62,12 +87,21 @@
 }
 
 .no-data-message {
-    height: 50%;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .no-data-message p {
-    text-align: center;
-  }
+  height: 50%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-data-message p {
+  text-align: center;
+}
+
+.user-data-item h3 {
+  margin-right: 10px;
+}
+
+.user-data-item input {
+  margin-bottom: 0;
+  flex: 1;
+}
