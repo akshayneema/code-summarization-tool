@@ -6,9 +6,6 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-image: url('image.jpg');
-  background-size: cover;
-  background-position: center;
 }
 
 .form-container {
@@ -39,6 +36,33 @@ input {
   color: white;
 }
 
+.icon {
+  color: white;
+  position: absolute;
+  right: 10px;
+  top: 18px;
+  transform: translateY(-50%);
+}
+
+/* Apply styles to the unordered list */
+ul.error-list {
+  color: orangered;
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+  font-size: small;
+}
+
+/* Apply styles to the list items */
+ul.error-list li {
+  margin-bottom: 5px; /* Add some space between each error message */
+}
+
+/* Apply styles to the asterisk */
+ul.error-list li:before {
+  content: '*'; /* Add asterisk before each error message */
+  margin-right: 5px; /* Add space between asterisk and error message */
+}
+
 button {
   display: block;
   width: 100%;
@@ -49,6 +73,15 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.register-button {
+  color: white;
+}
+
+.error-message {
+  color: orangered;
+  font-size: small;
 }
 
 button:hover {

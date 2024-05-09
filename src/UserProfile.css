@@ -1,0 +1,53 @@
+/* UserProfile.css */
+
+.user-profile-container {
+    color: black;
+    display: flex;
+    justify-content: space-between;
+}
+
+  
+  .user-data-container {
+    flex: 1;
+    margin-left: 30px;
+  }
+  
+  .charts-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .pie-chart-container,
+  .bar-graph-container {
+    flex: 1;
+  }
+  
+  .pie-chart,
+  .bar-graph {
+    margin: 10px;
+  }
+  
+
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('image.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.no-data-message {
+    height: 50%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .no-data-message p {
+    text-align: center;
+  }

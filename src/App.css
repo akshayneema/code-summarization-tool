@@ -1,0 +1,44 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: transparent;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px;
+    margin-left: auto
+  }
+  
+  button {
+    padding: 8px 16px;
+    color: black;
+    border: none;
+    cursor: pointer;
+  }
+
+.header-button {
+    background: transparent;
+}
+
+.header-button:hover {
+    text-decoration: underline;
+    background: transparent;
+}
+
+.app-container {
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.login-image {
+    background-image: url('image.jpg');
+}
+  
+.loggedin-image {
+    background-image: url('skyblue.jpg');
+}

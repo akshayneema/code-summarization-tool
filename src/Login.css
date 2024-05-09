@@ -4,9 +4,6 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-image: url('image.jpg');
-    background-size: cover;
-    background-position: center;
 }
 
 .form-container {
@@ -18,6 +15,9 @@
     margin: 0 auto; /* Center the form container horizontally */
 }
 
+.login-button {
+    color: white;
+}
 
 .login-heading {
     color: white;
@@ -28,13 +28,13 @@
     position: relative;
   }
   
-  .icon {
+.icon {
     color: white;
     position: absolute;
     right: 10px;
-    top: 50%;
+    top: 18px;
     transform: translateY(-50%);
-  }
+}
 
 input {
     background: transparent;
@@ -49,6 +49,10 @@ input {
 .error-message {
     color: red;
     margin-top: 5px;
+}
+
+.success-message {
+    color: white;
 }
 
 button {
