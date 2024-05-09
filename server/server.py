@@ -190,7 +190,7 @@ def generate_random_fact():
             completion = client.chat.completions.create(
                 model='gpt-3.5-turbo',
                 messages=[
-                    {"role": "system", "content": "You are an interesting fact generator."},
+                    {"role": "system", "content": "You are a very interesting fact generator that generates very interesting and quirky facts, do not repeat facts please."},
                     {"role": "user", "content": f"Did you know..."}
                 ]
             )
@@ -376,8 +376,6 @@ def average_ratings(user_id=None):
 
         # Return the ratings data for all users as JSON
         return jsonify(ratings_data)
-
-# Your existing code...
 
 if __name__ == '__main__':
     app.run(debug=True)
