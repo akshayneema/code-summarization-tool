@@ -70,3 +70,28 @@
   font-weight: bold;
   font-size: large;
 }
+
+/* Add these styles to the existing CSS */
+
+/* Styling for the chart selection dropdown */
+#chartType {
+  padding: 8px 12px; /* Add padding */
+  font-size: 16px; /* Set font size */
+  border: 1px solid #ccc; /* Add border */
+  border-radius: 4px; /* Add border radius */
+  background-color: white; /* Set background color */
+  color: black; /* Set text color */
+  cursor: pointer; /* Set cursor */
+}
+
+/* Hover effect for dropdown options */
+#chartType option:hover {
+  background-color: #f4f4f4; /* Set hover background color */
+}
+
+/* Focus effect for dropdown */
+#chartType:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #007bff; /* Set focus border color */
+}
+

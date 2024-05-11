@@ -26,6 +26,11 @@ const [newAdminEmail, setNewAdminEmail] = useState('');
 const [newAdminEmailError, setNewAdminEmailError] = useState('');
 const [ addAdminSuccessMessage, setAddAdminSuccessMessage] = useState(false);
 const [ addAdminErrorMessage, setAddAdminErrorMessage] = useState('');
+const [chartType, setChartType] = useState('pie');
+
+const handleChartChange = (e) => {
+  setChartType(e.target.value);
+};
 
 useEffect(() => {
   setRatingData([]);
@@ -319,38 +324,51 @@ return (
     
     {/* Display pie chart */}
     <div className="charts-container">
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <span>Select Users:&nbsp;&nbsp;</span>
-      <Select
-        options={userOptions}
-        isMulti
-        onChange={handleSelectChange}
-        placeholder={selectedUsers.length > 0 ? 'Selected Users' : 'Showing All Users'}
-        value={selectedUsers}
-        styles={{
-          menu: (provided, state) => ({
-            ...provided,
-            marginTop: 0, // Adjust the marginTop to 0
-          }),
-        }}
-      />
+      {/* Dropdown to select users */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <span>Select Users:&nbsp;&nbsp;</span>
+        <Select
+          options={userOptions}
+          isMulti
+          onChange={handleSelectChange}
+          placeholder={selectedUsers.length > 0 ? 'Selected Users' : 'Showing All Users'}
+          value={selectedUsers}
+          styles={{
+            menu: (provided, state) => ({
+              ...provided,
+              marginTop: 0, // Adjust the marginTop to 0
+            }),
+          }}
+        />
+      </div>
 
-    </div>
+      {/* Dropdown to select chart type */}
+      <div style={{ marginTop: '10px' }}>
+        <label htmlFor="chartType">Select Chart Type:&nbsp;&nbsp;</label>
+        <select id="chartType" value={chartType} onChange={handleChartChange}>
+          <option value="pie">Pie Chart</option>
+          <option value="bar">Bar Graph</option>
+        </select>
+      </div>
 
-      <div className="pie-chart-container">
-        <h2>Pie Chart:</h2>
-        <div>
+      {/* Display selected chart */}
+      {chartType === 'pie' && (
+        <div className="pie-chart-container">
+          <h2>Pie Chart:</h2>
+          <div>
             <PieChartComp data={ratingData} />
+          </div>
         </div>
-      </div>
-      
-      {/* Display bar graph */}
-      <div className="bar-graph-container">
-        <h2>Bar Graph:</h2>
-        <div>
+      )}
+
+      {chartType === 'bar' && (
+        <div className="bar-graph-container">
+          <h2>Bar Graph:</h2>
+          <div>
             <BarGraphComp data={ratingData} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   </div>
 );

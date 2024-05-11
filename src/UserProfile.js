@@ -15,6 +15,8 @@ const UserProfile = ( {user_id, user_name, user_email} ) => {
   const [selectedFeedback, setSelectedFeedback] = useState(null); // State to store selected feedback
   const [feedbackMap, setFeedbackMap] = useState({}); 
 
+  const [chartType, setChartType] = useState('pie');
+
   const [cookies, setCookie] = useCookies(['jwtToken']); // Retrieve the 'jwtToken' cookie
   const [emailError, setEmailError] = useState('');
   const [ successMessage, setSuccessMessage] = useState(false);
@@ -65,6 +67,10 @@ const handleUpdate = async () => {
             }, 2000);
         }
     }
+  };
+
+  const handleChartChange = (e) => {
+    setChartType(e.target.value);
   };
 
   const getUserRatingsData = async () => {
@@ -190,20 +196,33 @@ const handleUpdate = async () => {
       
       {/* Display pie chart */}
       <div className="charts-container">
-        <div className="pie-chart-container">
-          <h2>Pie Chart:</h2>
-          <div>
-            <PieChartComp data={ratingData} />
-          </div>
+        {/* Dropdown to select chart type */}
+        <div className="chart-selector">
+          <label htmlFor="chartType">Select Chart Type: </label>
+          <select id="chartType" value={chartType} onChange={handleChartChange}>
+            <option value="pie">Pie Chart</option>
+            <option value="bar">Bar Graph</option>
+          </select>
         </div>
-        
-        {/* Display bar graph */}
-        <div className="bar-graph-container">
-          <h2>Bar Graph:</h2>
-          <div>
-            <BarGraphComp data={ratingData} />
+
+        {/* Display selected chart */}
+        {chartType === 'pie' && (
+          <div className="pie-chart-container">
+            <h2>Pie Chart:</h2>
+            <div>
+              <PieChartComp data={ratingData} />
+            </div>
           </div>
-        </div>
+        )}
+
+        {chartType === 'bar' && (
+          <div className="bar-graph-container">
+            <h2>Bar Graph:</h2>
+            <div>
+              <BarGraphComp data={ratingData} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

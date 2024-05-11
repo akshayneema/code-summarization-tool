@@ -10,6 +10,7 @@ const GenerateSummary = ({userId}) => {
   // State to store code snippet input
   const [codeSnippet, setCodeSnippet] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedFileExtension, setSelectedFileExtension] = useState('');
   const [fileInputKey, setFileInputKey] = useState(0); // Key to reset the file input element
   // State to store the random fact
   const [randomFact, setRandomFact] = useState(null);
@@ -177,11 +178,44 @@ const GenerateSummary = ({userId}) => {
     setSelectedModel(event.target.value);
   };
 
-  // Function to handle file upload
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSelectedFileName(file.name); // Set the name of the selected file
+      const fileName = file.name;
+      const fileExtension = fileName.split('.').pop(); // Extract the extension
+      setSelectedFileName(fileName); // Set the name of the selected file
+      setSelectedFileExtension(fileExtension); // Set the detected file extension
+  
+      // Map file extensions to corresponding languages
+      const extensionToLanguageMap = {
+        py: 'Python',
+        js: 'JavaScript',
+        java: 'Java',
+        cpp: 'C++',
+        c: 'C',
+        cs: 'C#',
+        rb: 'Ruby',
+        php: 'PHP',
+        swift: 'Swift',
+        kt: 'Kotlin',
+        ts: 'TypeScript',
+        html: 'HTML',
+        css: 'CSS',
+        go: 'Go',
+        rs: 'Rust',
+        scala: 'Scala',
+        r: 'R',
+        m: 'MATLAB',
+        sh: 'Shell Script',
+        // Add more mappings as needed
+      };
+  
+      let language = extensionToLanguageMap[fileExtension.toLowerCase()]; // Get the corresponding language
+      if (!language) {
+        language = 'Other'; // Set to 'Other' if no matching language found
+      }
+      setSelectedLanguage(language); // Set the selected language
+  
       const reader = new FileReader();
       reader.onload = async (event) => {
         const content = event.target.result;
@@ -235,6 +269,23 @@ const GenerateSummary = ({userId}) => {
             <MenuItem value="Python">Python</MenuItem>
             <MenuItem value="JavaScript">JavaScript</MenuItem>
             <MenuItem value="Java">Java</MenuItem>
+            <MenuItem value="C">C</MenuItem>
+            <MenuItem value="C++">C++</MenuItem>
+            <MenuItem value="C#">C#</MenuItem>
+            <MenuItem value="Ruby">Ruby</MenuItem>
+            <MenuItem value="PHP">PHP</MenuItem>
+            <MenuItem value="Swift">Swift</MenuItem>
+            <MenuItem value="Kotlin">Kotlin</MenuItem>
+            <MenuItem value="TypeScript">TypeScript</MenuItem>
+            <MenuItem value="HTML">HTML</MenuItem>
+            <MenuItem value="CSS">CSS</MenuItem>
+            <MenuItem value="Go">Go</MenuItem>
+            <MenuItem value="Rust">Rust</MenuItem>
+            <MenuItem value="Scala">Scala</MenuItem>
+            <MenuItem value="R">R</MenuItem>
+            <MenuItem value="MATLAB">MATLAB</MenuItem>
+            <MenuItem value="Shell Script">Shell Script</MenuItem>
+            <MenuItem value="">Other</MenuItem>
           </Select>
         </div>
         <div className="model-dropdown">
@@ -284,7 +335,7 @@ const GenerateSummary = ({userId}) => {
             <input
               key={fileInputKey}
               type="file"
-              accept=".txt,.js,.py"
+              accept=".py,.js,.java,.cpp,.c,.cs,.rb,.php,.swift,.kt,.ts,.html,.css,.go,.rs,.scala,.r,.m,.sh" 
               onChange={(event) => { // Clear the file input field after selection
                 handleFileUpload(event); // Call handleFileUpload manually
               }}

@@ -56,7 +56,7 @@ const PieChartComp = ({ data }) => {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>
-                    <Tooltip formatter={(value, name) => [`${((value / totalrating) * 100).toFixed(2)}%`, name]} />
+                    <Tooltip />
                     <Legend />
                 </PieChart>
             ) : (
