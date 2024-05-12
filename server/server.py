@@ -482,25 +482,3 @@ def user_all_summaries(user_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-import tokenize
-import io
-
-def pythonTokenizer(line):
-    result= []
-    line = io.StringIO(line) 
-    
-    for toktype, tok, start, end, line in tokenize.generate_tokens(line.readline):
-        if (not toktype == tokenize.COMMENT):
-            if toktype == tokenize.STRING:
-                result.append("CODE_STRING")
-            elif toktype == tokenize.NUMBER:
-                result.append("CODE_INTEGER")
-            elif (not tok=="\n") and (not tok=="    "):
-                result.append(str(tok))
-    return ' '.join(result)
-
-if __name__ == '__main__':
-    app.run(debug=True)  # Run the Flask app in debug mode
