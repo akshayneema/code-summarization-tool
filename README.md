@@ -57,32 +57,19 @@ The Code Summarization Tool leverages the following technologies:
 1. **Activate Python Server:**
    ```bash
    conda activate cs520
+   export OPENAI_API_KEY="your_openai_api_key"
    python server/server.py
 
 2. **Start React App:**
    ```bash
    npm start
 
-## Open the web app in your browser:
+## Access the Web App
+
+You can access the web application in your browser using the following URLs:
+
 - React app: [http://localhost:3000](http://localhost:3000)
-- Python server: [http://localhost:5000](http://localhost:5000)
-
-## API Endpoints
-
-### POST /generate-summary
-Generates a summary for the provided code snippet.
-
-- **Request body:**
-  ```json
-  {
-    "codeSnippet": "Your code snippet here"
-  }
-
-- - **Response:**
-  ```json
-  {
-    "summary": "Generated summary text"
-  }
+- Python server: [http://localhost:5000](http://127.0.0.1:5000)
 
 ## Testing Instructions
 
@@ -99,4 +86,17 @@ To ensure the functionality and integrity of the frontend and backend code, we h
 3. **Run the pytest command:**
    ```bash
    pytest
+
+## Future Prospects
+
+As the Code Summarization Tool continues to evolve, there are several avenues for future development and enhancement:
+
+1. **Integration of On-premise LLMs**: Explore the integration of on-prem LLMs to reduce its dependence on third-party APIs.
+
+2. **Enhanced Feedback Analytics**: Implement more insightful ways in which the past feedback from the users can be analyzed and incorporated into improving the tool.
+
+3. **Support for Additional Usecases**: In addition to code summarization, include other use cases like syntax error detection, code translation, and many more.
+
+4. **Community Contributions**: Encourage contributions from the developer community through open-source collaboration, allowing for continuous improvement and innovation.
+
 
