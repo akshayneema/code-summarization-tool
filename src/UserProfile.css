@@ -1,41 +1,144 @@
 /* UserProfile.css */
 
+/* UserProfile.css */
+
 .user-profile-container {
-    color: black;
-    display: flex;
-    justify-content: space-between;
+  color: black;
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  height: 100vh; /* Set a fixed height for the container */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+.data-feedback-container {
+  flex: 1; /* Make the container take up remaining space */
+  margin-right: 20px; /* Add margin to separate from charts */
+  margin-left: 30px;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Set a fixed width for the charts container */
+  height: 100%; /* Set a fixed height for the container */
+  overflow-y: auto; /* Allow vertical scrolling if content overflows */
+}
+
+.user-data-container {
+  margin-bottom: 20px; /* Add some bottom margin */
+}
+
+.feedback-container {
+  width: 50%;
+  margin-bottom: 20px; /* Add margin between user data and feedbacks */
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Set a fixed width for the charts container */
+  justify-content: space-between;
+}
+
+.user-data-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  width: 50%;
+}
+
+.input-name {
+  color: black;
+}
+
+.input-email {
+  color: black;
+}
+
+.update-button {
+  width: 20%;
+}
+
+.error-message {
+  color: orangered;
+  font-size: medium;
+}
+
+.pie-chart-container,
+.bar-graph-container {
+  flex: 1;
+}
+
+.pie-chart,
+.bar-graph {
+  margin: 10px;
 }
 
   
-  .user-data-container {
-    flex: 1;
-  }
-  
-  .charts-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .pie-chart-container,
-  .bar-graph-container {
-    flex: 1;
-  }
-  
-  .pie-chart,
-  .bar-graph {
-    margin: 10px;
-  }
-  
 
-  .login-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-image: url('image.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.no-data-message {
+  height: 50%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.no-data-message p {
+  text-align: center;
+}
+
+.user-data-item h3 {
+  margin-right: 10px;
+}
+
+.user-data-item input {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.no-data-message {
+  font-weight: bold;
+  font-size: large;
+}
+
+/* Add these styles to the existing CSS */
+
+/* Styling for the dropdown */
+.chart-selector select {
+  padding: 8px 12px; /* Add padding */
+  font-size: 16px; /* Set font size */
+  border: 1px solid #ccc; /* Add border */
+  border-radius: 4px; /* Add border radius */
+  background-color: white; /* Set background color */
+  color: black; /* Set text color */
+  cursor: pointer; /* Set cursor */
+}
+
+/* Styling for dropdown options */
+.chart-selector select option {
+  background-color: white; /* Set background color */
+  color: black; /* Set text color */
+}
+
+/* Hover effect for dropdown options */
+.chart-selector select option:hover {
+  background-color: #f4f4f4; /* Set hover background color */
+}
+
+/* Focus effect for dropdown */
+.chart-selector select:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #007bff; /* Set focus border color */
 }

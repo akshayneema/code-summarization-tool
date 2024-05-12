@@ -1,17 +1,10 @@
 import React from 'react';
 import { PieChart, Pie, Tooltip, Cell, Legend } from 'recharts';
 
-const PieChartComp = () => {
-    // Sample data
-    const data = [
-        { name: 'Geeksforgeeks', rating: 400 },
-        { name: 'Technical scripter', rating: 700 },
-        { name: 'Geek-o-mania', rating: 600 }
-    ];
+const PieChartComp = ({ data }) => {
 
     // Calculate total rating
-    const totalrating = data.reduce((acc, curr) => acc + curr.rating, 0);
-
+    const totalrating = data.reduce((acc, curr) => acc + curr.rating, 0) || 0;
     // Define custom colors for each segment
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -48,23 +41,29 @@ const PieChartComp = () => {
     };
 
     return (
-        <div style={{ display: 'flex' }}>
-            <PieChart width={500} height={400}>
-                <Pie
-                    data={data}
-                    dataKey="rating"
-                    outerRadius={150}
-                    fill="green"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                >
-                    {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip formatter={(value, name) => [`${((value / totalrating) * 100).toFixed(2)}%`, name]} />
-                <Legend/>
-            </PieChart>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {totalrating > 0 ? (
+                <PieChart width={500} height={400}>
+                    <Pie
+                        data={data}
+                        dataKey="rating"
+                        outerRadius={150}
+                        fill="green"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                    >
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                </PieChart>
+            ) : (
+                <div style={{ width: 500, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <span className='no-data-message'>No data available</span>
+                </div>
+            )}
         </div>
     );
 }

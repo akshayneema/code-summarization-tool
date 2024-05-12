@@ -10,7 +10,10 @@ const GenerateSummary = ({userId}) => {
   // State to store code snippet input
   const [codeSnippet, setCodeSnippet] = useState('');
   const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedFileExtension, setSelectedFileExtension] = useState('');
   const [fileInputKey, setFileInputKey] = useState(0); // Key to reset the file input element
+  // State to store the random fact
+  const [randomFact, setRandomFact] = useState(null);
   // State to store generated summary
   const [summary, setSummary] = useState([]);
   // States to store ratings for each perspective
@@ -36,6 +39,7 @@ const GenerateSummary = ({userId}) => {
 
   const [theme, setTheme] = useState('light'); // Default theme is light
   const [cookies, setCookie] = useCookies(['jwtToken']);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
   // Effect to trigger blip animation when isSummaryGenerating is true
   useEffect(() => {
@@ -96,6 +100,25 @@ const GenerateSummary = ({userId}) => {
     setGenerationTime(timeTaken.toFixed(2)); // Round to 2 decimal places
   };
 
+  // Function to fetch a random fact from the server
+  const fetchRandomFact = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/generate-random-fact');
+      if (response.data.status === 200) {
+        console.log('Random fact:', response.data.fact);
+        setRandomFact(response.data.fact); // Set the random fact in state
+      } else {
+        throw new Error('Failed to fetch random fact');
+      }
+    } catch (error) {
+      console.error('Error fetching random fact:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRandomFact();
+  }, []);
+
   // Function to handle "Submit Rating" button click
   const submitRating = async () => {
     console.log('Naturalness Rating:', naturalnessRating);
@@ -117,6 +140,18 @@ const GenerateSummary = ({userId}) => {
         textual_feedback: textualFeedback // Include textual feedback
       });
 
+      // Check if the request was successful
+      if (response.status === 200) {
+        // Set feedback submission success message
+        setFeedbackMessage('Feedback submitted successfully !');
+      } else {
+        // Set feedback submission error message if the request was not successful
+        setFeedbackMessage('Error submitting feedback');
+      }
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 3000);
+
       setIsFeedbackSubmitted(true);
       // Reset ratings to default values
       setNaturalnessRating(3);
@@ -125,6 +160,11 @@ const GenerateSummary = ({userId}) => {
       setTextualFeedback('');
     } catch (error) {
       console.error('Error submitting feedback:', error);
+      // Set feedback submission error message
+      setFeedbackMessage('Error submitting feedback');
+      setTimeout(() => {
+        setFeedbackMessage(null);
+      }, 2000);
     }
 
     // setIsRatingSectionOpen(false);
@@ -138,11 +178,44 @@ const GenerateSummary = ({userId}) => {
     setSelectedModel(event.target.value);
   };
 
-  // Function to handle file upload
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSelectedFileName(file.name); // Set the name of the selected file
+      const fileName = file.name;
+      const fileExtension = fileName.split('.').pop(); // Extract the extension
+      setSelectedFileName(fileName); // Set the name of the selected file
+      setSelectedFileExtension(fileExtension); // Set the detected file extension
+  
+      // Map file extensions to corresponding languages
+      const extensionToLanguageMap = {
+        py: 'Python',
+        js: 'JavaScript',
+        java: 'Java',
+        cpp: 'C++',
+        c: 'C',
+        cs: 'C#',
+        rb: 'Ruby',
+        php: 'PHP',
+        swift: 'Swift',
+        kt: 'Kotlin',
+        ts: 'TypeScript',
+        html: 'HTML',
+        css: 'CSS',
+        go: 'Go',
+        rs: 'Rust',
+        scala: 'Scala',
+        r: 'R',
+        m: 'MATLAB',
+        sh: 'Shell Script',
+        // Add more mappings as needed
+      };
+  
+      let language = extensionToLanguageMap[fileExtension.toLowerCase()]; // Get the corresponding language
+      if (!language) {
+        language = 'Other'; // Set to 'Other' if no matching language found
+      }
+      setSelectedLanguage(language); // Set the selected language
+  
       const reader = new FileReader();
       reader.onload = async (event) => {
         const content = event.target.result;
@@ -196,6 +269,23 @@ const GenerateSummary = ({userId}) => {
             <MenuItem value="Python">Python</MenuItem>
             <MenuItem value="JavaScript">JavaScript</MenuItem>
             <MenuItem value="Java">Java</MenuItem>
+            <MenuItem value="C">C</MenuItem>
+            <MenuItem value="C++">C++</MenuItem>
+            <MenuItem value="C#">C#</MenuItem>
+            <MenuItem value="Ruby">Ruby</MenuItem>
+            <MenuItem value="PHP">PHP</MenuItem>
+            <MenuItem value="Swift">Swift</MenuItem>
+            <MenuItem value="Kotlin">Kotlin</MenuItem>
+            <MenuItem value="TypeScript">TypeScript</MenuItem>
+            <MenuItem value="HTML">HTML</MenuItem>
+            <MenuItem value="CSS">CSS</MenuItem>
+            <MenuItem value="Go">Go</MenuItem>
+            <MenuItem value="Rust">Rust</MenuItem>
+            <MenuItem value="Scala">Scala</MenuItem>
+            <MenuItem value="R">R</MenuItem>
+            <MenuItem value="MATLAB">MATLAB</MenuItem>
+            <MenuItem value="Shell Script">Shell Script</MenuItem>
+            <MenuItem value="">Other</MenuItem>
           </Select>
         </div>
         <div className="model-dropdown">
@@ -245,7 +335,7 @@ const GenerateSummary = ({userId}) => {
             <input
               key={fileInputKey}
               type="file"
-              accept=".txt,.js,.py"
+              accept=".py,.js,.java,.cpp,.c,.cs,.rb,.php,.swift,.kt,.ts,.html,.css,.go,.rs,.scala,.r,.m,.sh" 
               onChange={(event) => { // Clear the file input field after selection
                 handleFileUpload(event); // Call handleFileUpload manually
               }}
@@ -294,15 +384,30 @@ const GenerateSummary = ({userId}) => {
             </div>
           </>
         ) : (
-          <div className="no-summary-placeholder">
-            {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
-            <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
-            <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
-          </div>
+          <>
+            {randomFact ? (
+              <div className="no-summary-placeholder">
+                <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+                <p className="random-fact-message">By the time you generate a summary, enjoy this interesting fact - </p>
+                <p className="random-fact">{randomFact}</p>
+              </div>
+            ) : (
+              <div className="no-summary-placeholder">
+                {/* <img src="robot-no-summary.png" alt="No summary available" className="robot-image" /> */}
+                <p className="no-summary-message">Oops! Looks like there's no summary available.</p>
+                <p className="no-summary-tip">Try generating one by inputting your code snippet and clicking "Generate Summary"!</p>
+              </div>
+            )}
+            </>
         )}
       </>
     )}
         </div>
+
+        <div>
+          {/* Feedback submission message */}
+          {feedbackMessage && <p style={{ fontWeight: 'bold' }}>{feedbackMessage}</p>}
+      </div>
 
         {/* Rating section */}
         <div className={`rating-container ${theme === 'dark' ? 'dark-mode' : ''} ${isRatingSectionOpen && summary && !isSummaryGenerating ? '' : 'hidden'}`}>
