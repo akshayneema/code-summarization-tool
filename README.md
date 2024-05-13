@@ -41,7 +41,7 @@ The Code Summarization Tool leverages the following technologies:
 
 2. **Install frontend dependencies**
    ```bash
-   npm install
+   npm install --force
 
 3. **Create and activate a conda environment:**
    ```bash
@@ -73,7 +73,7 @@ You can access the web application in your browser using the following URLs:
 
 ## Testing Instructions
 
-To ensure the functionality and integrity of the frontend and backend code, we have included tests using pytest for the Flask backend. Follow these instructions to run the tests:
+To ensure the functionality and integrity of the frontend and backend code, we have included tests for both the Flask backend and the React frontend.
 
 1. **Activate the conda environment:**
    ```bash
@@ -83,9 +83,20 @@ To ensure the functionality and integrity of the frontend and backend code, we h
    ```bash
    cd code-summarization-tool
 
-3. **Run the pytest command:**
+3. **Run the pytest command for backend testing:**
    ```bash
    pytest
+
+3. **Run the jest command for backend testing:**
+   ```bash
+   npx jest
+   ```
+   
+   or
+   
+   ```bash
+   npm test
+   ```
 
 ## Future Prospects
 
