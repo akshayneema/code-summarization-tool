@@ -21,9 +21,14 @@ const Login = ({onSuccess, onRegisterClick, registerSuccess}) => {
       const response = await axios.post('http://127.0.0.1:5000/login', { username, password });
       console.log(response.data); // You can handle the response accordingly
       // Assuming the token is sent as a variable named 'access_token'
-      const token = response.data.access_token
-      setCookie('jwtToken', token, { path: '/' });
-      onSuccess(response.data.user_id, response.data.role, response.data.first_login); // Call the onSuccess function passed as a prop
+      if (response.data && response.data.access_token) {
+        const token = response.data.access_token
+        setCookie('jwtToken', token, { path: '/' });
+        onSuccess(response.data.user_id, response.data.role, response.data.first_login); // Call the onSuccess function passed as a prop
+      } else {
+        setInvalidCreds(true);
+      }
+      
     } catch (error) {
       console.error('Error logging in:', error);
       setInvalidCreds(true);
@@ -40,11 +45,11 @@ const Login = ({onSuccess, onRegisterClick, registerSuccess}) => {
           <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
         </div>
         <div className="input-container">
-          <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} className="icon" onClick={togglePasswordVisibility} />
-          <input type={showPassword ? "text" : "password"} placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} className="icon" data-testid="toggle-password-visibility" onClick={togglePasswordVisibility} />
+          <input type={showPassword ? "text" : "password"} placeholder="Password" value={password} data-testid="password-input" onChange={(e) => setPassword(e.target.value)} />
         </div>
-        {invalidCreds && <p className="error-message">Invalid Username or Password</p>}
-        <button onClick={handleLogin} className='login-button'>Login</button>
+        {invalidCreds && <p data-testid="invalid-username" className="error-message">Invalid Username or Password</p>}
+        <button data-testid="login-button" onClick={handleLogin} className='login-button'>Login</button>
         <p className="no-account">Don't have an account? </p>
         <span className="register-link" tabIndex="0" onClick={onRegisterClick}>Register</span>
       </div>

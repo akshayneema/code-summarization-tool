@@ -101,7 +101,7 @@ const handleUpdate = async () => {
                 }
             }
         );
-        if (response.data && response.data.status == 'True') {
+        if (response && response.data && response.data.status == 'True') {
             setSuccessMessage(true);
             setTimeout(() => {
                 setSuccessMessage(false);
@@ -249,6 +249,7 @@ return (
         <div className="admin-data-item">
             <h3>Email:</h3>
             <input
+            data-testid="admin-data-email"
             type="email"
             placeholder="Enter email"
             className="input-email"
@@ -258,7 +259,7 @@ return (
         </div>
       {emailError && <p className="error-message">{emailError}</p>}
       {/* Button to update admin data */}
-      <button onClick={handleUpdate} className='update-button'>Update</button>
+      <button data-testid="update-admin-date-button" onClick={handleUpdate} className='update-button'>Update</button>
       {successMessage && <p className='success-message'>Admin profile updated successfully</p> }
 
       <h2>Add New User:</h2>
@@ -277,6 +278,7 @@ return (
         <div className="admin-data-item">
             <h3>User Email:</h3>
             <input
+            data-testid="new-user-email"
             type="email"
             placeholder="Enter email"
             className="input-email"
@@ -306,6 +308,7 @@ return (
         <div className="admin-data-item">
             <h3>Admin Email:</h3>
             <input
+            data-testid="new-admin-email"
             type="email"
             placeholder="Enter email"
             className="input-email"

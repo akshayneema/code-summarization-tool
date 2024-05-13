@@ -119,7 +119,7 @@ const Register = ({onSuccess, onLoginClick}) => {
           <input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" value={confirmPassword} onChange={handleConfirmPasswordChange} />
           {confirmPasswordError && <p className="error-message">{confirmPasswordError}</p>}
         </div>
-        <button onClick={handleRegister} className='register-button'>Register</button>
+        <button data-testid="register-button" onClick={handleRegister} className='register-button'>Register</button>
         <p className="account-exists">Already have an account? </p>
         <span className="login-link" tabIndex="0" onClick={onLoginClick}>Login</span>
       </div>

@@ -1,5 +1,10 @@
 # Code Summarization Tool
 
+
+<p align="center">
+    <img src="images/logo.png" alt="Code Summarization Tool Logo">
+</p>
+
 Final Presentation Video Link - https://drive.google.com/file/d/1uauip8CEsvAvflRH6JHCQHHA0yUofBtM/view?usp=sharing
 
 ## Overview
