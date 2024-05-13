@@ -1,5 +1,7 @@
 # Code Summarization Tool
 
+![Code Summarization Tool Logo](images/logo.png)
+
 ## Overview
 The Code Summarization Tool is a comprehensive web application designed to facilitate efficient code comprehension for both users and administrators. It offers two distinct views:
 
