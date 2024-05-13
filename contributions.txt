@@ -1,0 +1,22 @@
+Member Contributions:
+
+1. : Keerthy Kaushik Dasoju
+   - Implemented Backend with Flask and SQLite.
+   - Managed server setup and deployment.
+   - Led frontend testing efforts.
+
+2. : Harshith Reddy Takkala
+   - Integrated OpenAI APIs for code summarization.
+   - Explored future integration possibilities.
+   - Supported backend development.
+
+3. : Akshay Neema
+   - Developed User and Admin Interface with React.js.
+   - Additionally worked on Flask, implementing backend.
+   - Led automated backend testing.
+   - Provided input on future enhancements.
+
+4. : Anvitha Kannapu
+   - Managed project coordination and documentation.
+   - Compiled setup and testing instructions.
+   - Assisted in writing the final project report.
