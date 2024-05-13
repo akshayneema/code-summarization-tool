@@ -1,6 +1,8 @@
 # Code Summarization Tool
 
-![Code Summarization Tool Logo](images/logo.png)
+<p align="center">
+    <img src="images/logo.png" alt="Code Summarization Tool Logo">
+</p>
 
 ## Overview
 The Code Summarization Tool is a comprehensive web application designed to facilitate efficient code comprehension for both users and administrators. It offers two distinct views:
