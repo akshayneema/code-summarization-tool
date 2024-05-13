@@ -29,7 +29,7 @@ const BarGraphComp = ({ data }) => {
                 </BarChart>
             ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <span className='no-data-message'>No data available</span>
+                    <span data-testid="bar-no-data-available" className='no-data-message'>No data available</span>
                 </div>
             )}
         </div>

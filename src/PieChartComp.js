@@ -61,7 +61,7 @@ const PieChartComp = ({ data }) => {
                 </PieChart>
             ) : (
                 <div style={{ width: 500, height: 400, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <span className='no-data-message'>No data available</span>
+                    <span data-testid="pie-no-data-available" className='no-data-message'>No data available</span>
                 </div>
             )}
         </div>
